@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Tailwind extensions */
+@layer components {
+  .btn-primary {
+    @apply bg-fresh-green text-white px-6 py-2 rounded-lg font-semibold hover:bg-leaf-green transition;
+  }
+
+  .btn-secondary {
+    @apply border-2 border-fresh-green text-fresh-green px-6 py-2 rounded-lg font-semibold hover:bg-fresh-green hover:text-white transition;
+  }
+
+  .card {
+    @apply bg-card-dark rounded-lg p-6 border border-slate-700;
+  }
+
+  .metric-value {
+    @apply text-4xl font-bold text-fresh-green;
+  }
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-in;
+}
+
+/* Smooth transitions */
+* {
+  transition: color 0.3s ease, background-color 0.3s ease;
+}

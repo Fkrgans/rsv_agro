@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>RSV Hydro-sense | Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sb-w:220px;
+  --top-h:58px;
+  --bg:#080f1e;
+  --sb-bg:#0b1325;
+  --card:#0f1b30;
+  --card2:#121e35;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.1);
+  --text:#e8edf5;
+  --muted:#6b7fa3;
+  --muted2:#4a5a7a;
+  --accent:#10b981;
+  --accent2:#059669;
+  --accent-dim:rgba(16,185,129,0.12);
+  --accent-glow:rgba(16,185,129,0.25);
+  --cyan:#06b6d4;
+  --orange:#f97316;
+  --blue:#3b82f6;
+  --purple:#a855f7;
+  --red:#ef4444;
+  --yellow:#f59e0b;
+}
+body.light{
+  --bg:#f8fafc;
+  --sb-bg:#ffffff;
+  --card:#f8fafc;
+  --card2:#ffffff;
+  --border:rgba(15,23,42,0.08);
+  --border2:rgba(15,23,42,0.12);
+  --text:#0f172a;
+  --muted:#475569;
+  --muted2:#64748b;
+  --accent:#10b981;
+  --accent2:#059669;
+  --accent-dim:rgba(16,185,129,0.12);
+  --accent-glow:rgba(16,185,129,0.18);
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+
+/* ── LOADER ─── */
+#loader{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:opacity .5s,visibility .5s}
+#loader.out{opacity:0;visibility:hidden;pointer-events:none}
+.ld-ring{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:18px;animation:ldp 2s ease-in-out infinite;box-shadow:0 0 40px rgba(16,185,129,.25)}
+@keyframes ldp{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.ld-bar{width:140px;height:2px;background:rgba(255,255,255,.08);border-radius:1px;overflow:hidden;margin-top:14px}
+.ld-fill{height:100%;background:linear-gradient(90deg,#10b981,#34d399);width:0;transition:width .2s}
+
+/* ── TOP BAR ─── */
+#topbar{
+  height:var(--top-h);flex-shrink:0;
+  display:flex;align-items:center;gap:12px;
+  padding:0 20px 0 0;
+  background:var(--sb-bg);
+  border-bottom:1px solid var(--border);
+  position:relative;z-index:40;
+}
+.tb-left{width:var(--sb-w);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 16px 0 18px;border-right:1px solid var(--border)}
+.logo-wrap{display:flex;align-items:center;gap:9px}
+.logo-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:900;font-size:1rem;color:#fff;box-shadow:0 3px 10px rgba(16,185,129,.3);flex-shrink:0}
+.logo-text{font-family:'Outfit',sans-serif;font-weight:800;font-size:.82rem;letter-spacing:-.01em;background:linear-gradient(135deg,#34d399,#10b981);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.2}
+.tb-collapse{width:28px;height:28px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .2s;flex-shrink:0}
+.tb-collapse:hover{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-glow)}
+
+.tb-breadcrumb{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted);margin-left:20px}
+.tb-breadcrumb span{color:var(--text);font-weight:600}
+.tb-breadcrumb i{font-size:.7rem;opacity:.5}
+
+.tb-search{flex:1;max-width:280px;margin-left:10px;position:relative}
+.tb-search input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:7px 14px 7px 36px;font-size:.8rem;color:var(--text);outline:none;transition:border-color .2s;font-family:'DM Sans',sans-serif}
+.tb-search input::placeholder{color:var(--muted2)}
+.tb-search input:focus{border-color:var(--accent-glow)}
+.tb-search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:.4;pointer-events:none;width:14px;height:14px}
+
+.tb-datetime{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted);padding:0 4px;white-space:nowrap}
+.tb-datetime strong{color:var(--text);font-weight:600;font-family:'JetBrains Mono',monospace}
+.tb-sep{color:var(--muted2);font-size:.7rem}
+
+.tb-qa{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;background:var(--accent);color:#fff;font-size:.78rem;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s;position:relative}
+.tb-qa:hover{background:var(--accent2);transform:translateY(-1px)}
+.tb-qa.open{background:var(--accent2)}
+.quick-actions-wrap{position:relative}
+.quick-panel{position:absolute;right:0;top:calc(100% + 10px);min-width:220px;background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.16);padding:12px;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all .2s ease;z-index:45}
+.quick-panel.open{opacity:1;visibility:visible;transform:translateY(0)}
+.quick-panel-head{font-size:.78rem;font-weight:700;color:var(--text);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08)}
+.quick-action{width:100%;text-align:left;padding:10px 12px;border:none;border-radius:12px;background:transparent;color:var(--text);font-size:.86rem;font-weight:700;cursor:pointer;transition:background .2s;display:block;margin-bottom:8px}
+.quick-action:hover{background:rgba(255,255,255,.05)}
+.quick-action:last-child{margin-bottom:0}
+
+.tb-icon-btn{width:34px;height:34px;border-radius:9px;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;position:relative;flex-shrink:0}
+.tb-icon-btn:hover{border-color:var(--border2);color:var(--text)}
+.tb-icon-btn .badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:.55rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--sb-bg)}
+
+.tb-user{display:flex;align-items:center;gap:8px;padding:5px 10px 5px 6px;border-radius:10px;background:var(--card);border:1px solid var(--border);cursor:pointer;transition:all .2s}
+.tb-user:hover{border-color:var(--border2)}
+.tb-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#fff;flex-shrink:0}
+.tb-user-info{line-height:1.3}
+.tb-user-name{font-size:.75rem;font-weight:700;color:var(--text)}
+.tb-user-role{font-size:.62rem;color:var(--muted)}
+
+/* ── BODY AREA ─── */
+#body-area{flex:1;display:flex;overflow:hidden}
+
+/* ── SIDEBAR ─── */
+#sidebar{
+  width:var(--sb-w);flex-shrink:0;
+  background:var(--sb-bg);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+  transition:width .3s ease;
+}
+#sidebar::-webkit-scrollbar{width:4px}
+#sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+.sb-section{padding:16px 12px 8px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2)}
+
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;margin:1px 8px;border-radius:10px;
+  cursor:pointer;transition:all .22s;
+  border:1px solid transparent;
+  text-decoration:none;
+}
+.nav-item:hover{background:rgba(255,255,255,.04);border-color:var(--border)}
+.nav-item.active{background:var(--accent-dim);border-color:var(--accent-glow)}
+.nav-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;background:rgba(255,255,255,.05)}
+.nav-item.active .nav-icon{background:rgba(16,185,129,.15)}
+.nav-label{font-size:.82rem;font-weight:600;color:var(--muted);transition:color .2s;white-space:nowrap;overflow:hidden}
+.nav-item:hover .nav-label{color:var(--text)}
+.nav-item.active .nav-label{color:var(--accent)}
+.nav-badge{margin-left:auto;min-width:20px;height:20px;border-radius:100px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800;padding:0 6px;flex-shrink:0}
+.nb-green{background:rgba(16,185,129,.15);color:var(--accent)}
+.nb-blue{background:rgba(59,130,246,.15);color:var(--blue)}
+
+.sb-bottom{margin-top:auto;padding:12px 8px 16px}
+.sb-user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--card);border:1px solid var(--border);cursor:pointer}
+.sb-user-card:hover{border-color:var(--border2)}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:#fff;flex-shrink:0}
+.sb-user-info{flex:1;min-width:0}
+.sb-user-name{font-size:.78rem;font-weight:700;color:var(--text)}
+.sb-user-role{font-size:.65rem;color:var(--muted)}
+.sb-logout{width:24px;height:24px;border-radius:6px;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .2s;flex-shrink:0}
+.sb-logout:hover{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:var(--red)}
+
+/* ── MAIN ─── */
+#main{flex:1;overflow-y:auto;overflow-x:hidden;padding:22px 24px 32px}
+#main::-webkit-scrollbar{width:5px}
+#main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+.welcome-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.welcome-text h2{font-family:'Outfit',sans-serif;font-size:1.45rem;font-weight:800;letter-spacing:-.02em;color:var(--text)}
+.welcome-text h2 em{color:var(--accent);font-style:normal}
+.welcome-text p{font-size:.8rem;color:var(--muted);margin-top:2px}
+.welcome-pills{display:flex;align-items:center;gap:8px}
+.pill-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;font-size:.75rem;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s}
+.pill-admin{background:var(--accent);color:#fff}
+.pill-admin:hover{background:var(--accent2)}
+.pill-notif{background:var(--card);border:1px solid var(--border);color:var(--muted)}
+.pill-notif:hover{border-color:var(--border2);color:var(--text)}
+
+/* ── METRIC CARDS ─── */
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.mcard{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:18px 20px;cursor:default;
+  transition:transform .22s,border-color .22s,box-shadow .22s;
+  position:relative;overflow:hidden;
+}
+.mcard:hover{transform:translateY(-3px);border-color:var(--border2);box-shadow:0 12px 32px rgba(0,0,0,.3)}
+.mcard-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.mcard-label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.mcard-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.mcard-val{font-family:'Outfit',sans-serif;font-size:2.4rem;font-weight:900;line-height:1;letter-spacing:-.03em;color:var(--text)}
+.mcard-sub{font-size:.72rem;color:var(--muted);margin-top:5px}
+.mcard-bar-track{height:4px;background:rgba(255,255,255,.07);border-radius:2px;margin-top:10px;overflow:hidden}
+.mcard-bar-fill{height:100%;border-radius:2px;transition:width 1.2s ease}
+.mcard-foot{font-size:.68rem;font-weight:700;margin-top:6px}
+.mc-accent{color:var(--accent)}
+.mc-warn{color:var(--yellow)}
+.mc-danger{color:var(--red)}
+
+/* ── CHARTS ROW ─── */
+.charts-row{display:grid;grid-template-columns:1fr 340px;gap:14px;margin-bottom:18px}
+ .chart-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 22px}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.chart-title{font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;color:var(--text)}
+.chart-subtitle{font-size:.72rem;color:var(--muted);margin-top:2px}
+.chart-legend{display:flex;align-items:center;gap:12px}
+.cl-item{display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--muted)}
+.panel-analytics .ctrl-card{background:#071c32;border-color:rgba(255,255,255,.08)}
+.panel-analytics .ctrl-card .ctrl-header{color:#e8edf5}
+.cl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+.donut-center{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.dl-item{display:flex;align-items:center;gap:6px;font-size:.72rem}
+.dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dl-name{color:var(--muted)}
+.dl-pct{font-weight:700;color:var(--text);margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.7rem}
+
+/* ── QUICK CONTROLS + ALERTS ROW ─── */
+.bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ctrl-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 22px}
+.ctrl-header{font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;color:var(--text);margin-bottom:14px}
+.ctrl-items{display:flex;flex-direction:column;gap:8px}
+.ctrl-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:var(--card2);border:1px solid var(--border);transition:border-color .2s}
+.ctrl-row:hover{border-color:var(--border2)}
+.ctrl-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.ctrl-info{flex:1;min-width:0}
+.ctrl-name{font-size:.82rem;font-weight:700;color:var(--text)}
+.ctrl-desc{font-size:.68rem;color:var(--muted)}
+.ctrl-status{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:600;white-space:nowrap}
+.sensor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.sensor-card{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.sensor-card .card-title{font-size:.78rem;font-weight:700;color:var(--text)}
+.sensor-card .card-metric{font-family:'Outfit',sans-serif;font-size:1.9rem;font-weight:900;color:var(--text)}
+.sensor-card .card-meta{font-size:.75rem;color:var(--muted)}
+.sensor-card .card-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:.72rem;font-weight:700;border:1px solid rgba(255,255,255,.08)}
+.sensor-card .pill-ok{color:var(--accent);border-color:rgba(16,185,129,.2)}
+.sensor-card .pill-warn{color:var(--yellow);border-color:rgba(245,158,11,.2)}
+.sensor-card .pill-danger{color:var(--red);border-color:rgba(239,68,68,.2)}
+.staff-table{width:100%;border-collapse:collapse}
+.staff-table th,.staff-table td{padding:12px 14px;font-size:.79rem;color:var(--text);border-bottom:1px solid var(--border)}
+.staff-table th{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.staff-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:.72rem;font-weight:700}
+.staff-pill.active{background:rgba(16,185,129,.12);color:var(--accent)}
+.staff-pill.paused{background:rgba(245,158,11,.12);color:var(--yellow)}
+.staff-btn{padding:10px 16px;border-radius:10px;border:none;font-size:.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.staff-btn.primary{background:linear-gradient(135deg,#059669,#10b981);color:#fff}
+.staff-btn.secondary{background:var(--card2);border:1px solid var(--border2);color:var(--muted)}
+.staff-btn:hover{transform:translateY(-1px)}
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);opacity:0;visibility:hidden;transition:opacity .2s ease,visibility .2s ease;z-index:1000}
+.modal.open{opacity:1;visibility:visible}
+.modal-box{width:min(100%,420px);background:var(--bg);border:1px solid var(--border);border-radius:24px;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:24px;color:var(--text)}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
+.modal-title{font-size:1.05rem;font-weight:700}
+.modal-close{border:0;background:transparent;color:var(--muted);font-size:1.35rem;cursor:pointer;line-height:1}
+.modal-field{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.modal-field label{font-size:.82rem;color:var(--muted);font-weight:700}
+.modal-field input{width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--text);outline:none;font-family:'DM Sans',sans-serif}
+.modal-field input:focus{border-color:var(--accent-glow);box-shadow:0 0 0 4px rgba(16,185,129,.08)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.modal-actions .staff-btn.primary{flex:1}
+.modal-actions .staff-btn.secondary{flex:1;background:#1b2434;color:var(--text);border-color:rgba(255,255,255,.08)}
+.billing-panel .billing-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.billing-panel .bill-card{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:18px 20px}
+.billing-panel .bill-card .bill-title{font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.billing-panel .bill-card .bill-value{font-family:'Outfit',sans-serif;font-size:1.9rem;font-weight:900;color:var(--text)}
+.billing-panel .invoices-table{width:100%;border-collapse:collapse}
+.billing-panel .invoices-table th,.billing-panel .invoices-table td{padding:12px 14px;font-size:.78rem;color:var(--text);border-bottom:1px solid var(--border)}
+.billing-panel .invoices-table th{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.billing-panel .invoice-status{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:.72rem;font-weight:700}
+.billing-panel .invoice-status.paid{background:rgba(16,185,129,.12);color:var(--accent)}
+.billing-panel .invoice-status.due{background:rgba(245,158,11,.12);color:var(--yellow)}
+.billing-panel .invoice-action{padding:8px 12px;border-radius:10px;border:none;font-size:.75rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.billing-panel .invoice-action.primary{background:linear-gradient(135deg,#059669,#10b981);color:#fff}
+.billing-panel .invoice-action.secondary{background:var(--card);border:1px solid var(--border2);color:var(--text)}
+/* Toggle */
+.sw{position:relative;width:42px;height:23px;flex-shrink:0}
+.sw input{display:none}
+.sw-track{position:absolute;inset:0;border-radius:100px;background:var(--card2);border:1px solid var(--border2);cursor:pointer;transition:all .28s}
+.sw-thumb{position:absolute;top:3px;left:3px;width:15px;height:15px;border-radius:50%;background:var(--muted);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .28s,background .28s;cursor:pointer;pointer-events:none}
+.sw input:checked~.sw-track{background:linear-gradient(135deg,#059669,#10b981);border-color:transparent}
+.sw input:checked~.sw-thumb{transform:translateX(19px);background:#fff}
+
+/* Alert items */
+.alert-list{display:flex;flex-direction:column;gap:7px}
+.alert-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid;font-size:.78rem;font-weight:500}
+.a-ok  {background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.2);color:var(--text)}
+.a-warn{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.2);color:var(--text)}
+.a-err {background:rgba(239,68,68,.07); border-color:rgba(239,68,68,.2); color:var(--text)}
+.a-ico {font-size:.9rem;flex-shrink:0}
+
+/* ── PILL/BADGE ─── */
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;font-size:.65rem;font-weight:700;border:1px solid}
+.sp-green{background:rgba(16,185,129,.12);color:var(--accent);border-color:rgba(16,185,129,.25)}
+.sp-red  {background:rgba(239,68,68,.12); color:var(--red);   border-color:rgba(239,68,68,.25)}
+.sp-blue {background:rgba(59,130,246,.12);color:var(--blue);  border-color:rgba(59,130,246,.25)}
+.sp-yellow{background:rgba(245,158,11,.12);color:var(--yellow);border-color:rgba(245,158,11,.25)}
+.pulse-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pd 1.4s ease-in-out infinite}
+@keyframes pd{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── LIVE BADGE in topbar ─── */
+.live-badge{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:100px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--accent);white-space:nowrap}
+
+/* ── TOAST ─── */
+.toast{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;align-items:center;gap:9px;padding:11px 16px;border-radius:12px;font-size:.82rem;font-weight:600;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:tIn .3s ease forwards}
+@keyframes tIn{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+.t-success{background:linear-gradient(135deg,#059669,#10b981)}
+.t-warn   {background:linear-gradient(135deg,#b45309,#f59e0b)}
+.t-info   {background:linear-gradient(135deg,#1d4ed8,#3b82f6)}
+.t-danger {background:linear-gradient(135deg,#b91c1c,#ef4444)}
+
+/* ── PANEL FADE ─── */
+.panel{animation:pfIn .3s ease}
+@keyframes pfIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── OVERVIEW PANEL specific grid fix ─── */
+@media(max-width:1100px){.metrics-grid{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}}
+@media(max-width:860px){.bottom-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-ring">🌱</div>
+  <p style="font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;color:#f1f5f9;letter-spacing:-.02em">RSV Hydro-sense</p>
+  <p style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#34d399;letter-spacing:.18em;text-transform:uppercase;margin-top:3px">Initializing Dashboard...</p>
+  <div class="ld-bar"><div class="ld-fill" id="ld-fill"></div></div>
+  <p style="font-size:.68rem;color:rgba(255,255,255,.25);margin-top:7px" id="ld-status">Connecting to IoT Node...</p>
+</div>
+
+<!-- TOP BAR -->
+<header id="topbar">
+  <!-- Logo + collapse -->
+  <div class="tb-left">
+    <div class="logo-wrap">
+      <div class="logo-icon">R</div>
+      <div class="logo-text">RSV<br>Hydro-sense</div>
+    </div>
+    <button class="tb-collapse" id="sidebar-toggle" title="Toggle sidebar">‹</button>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="tb-breadcrumb">
+    <span style="color:var(--muted)">RSV</span>
+    <span style="color:var(--muted2);font-size:.8rem">›</span>
+    <span>Administrator</span>
+  </div>
+
+  <!-- Search -->
+  <div class="tb-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Search sensors, controls...   ⌘K">
+  </div>
+
+  <!-- Datetime -->
+  <div class="tb-datetime">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <strong id="tb-time">--:-- --</strong>
+    <span class="tb-sep">|</span>
+    <span id="tb-date">---</span>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions-wrap">
+    <button class="tb-qa" onclick="toggleQuickActions(event)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Quick Actions
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="quick-panel" class="quick-panel" aria-hidden="true">
+      <div class="quick-panel-head">Quick Actions</div>
+      <button type="button" class="quick-action" onclick="quickAction('analytics')">View Analytics</button>
+      <button type="button" class="quick-action" onclick="quickAction('export')">Export CSV</button>
+      <button type="button" class="quick-action" onclick="quickAction('invite')">Invite Staff</button>
+      <button type="button" class="quick-action" onclick="quickAction('theme')">Toggle Theme</button>
+    </div>
+  </div>
+
+  <!-- Live badge -->
+  <div class="live-badge">
+    <span class="pulse-dot"></span>
+    LIVE · <span id="tb-live-time">--:--:--</span>
+  </div>
+
+  <!-- Notifications -->
+  <button class="tb-icon-btn" title="Show notifications" aria-label="Notifications" onclick="showToast('2 new alerts','warn')">
+    <span class="badge">2</span>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+  </button>
+
+  <!-- Theme toggle -->
+  <button class="tb-icon-btn" id="theme-btn" title="Toggle theme" aria-label="Toggle theme" onclick="toggleTheme()">
+    <svg id="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+
+  <!-- User pill -->
+  <div class="tb-user">
+    <div class="tb-avatar">A</div>
+    <div class="tb-user-info">
+      <div class="tb-user-name">Admin RSV</div>
+      <div class="tb-user-role">Administrator</div>
+    </div>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+</header>
+
+<!-- BODY -->
+<div id="body-area">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div style="height:8px"></div>
+    <div class="sb-section">Main Menu</div>
+
+    <a class="nav-item active" data-tab="overview">
+      <div class="nav-icon">📊</div>
+      <span class="nav-label">Dashboard</span>
+    </a>
+    <a class="nav-item" data-tab="sensors">
+      <div class="nav-icon">📡</div>
+      <span class="nav-label">Sensors</span>
+    </a>
+    <a class="nav-item" data-tab="control">
+      <div class="nav-icon">⚡</div>
+      <span class="nav-label">Controls</span>
+    </a>
+    <a class="nav-item" data-tab="history">
+      <div class="nav-icon">📜</div>
+      <span class="nav-label">History</span>
+    </a>
+    <a class="nav-item" data-tab="analytics">
+      <div class="nav-icon">📈</div>
+      <span class="nav-label">Analytics</span>
+      <span class="nav-badge nb-green">New</span>
+    </a>
+
+    <div class="sb-section" style="margin-top:4px">Management</div>
+
+    <a class="nav-item" data-tab="settings">
+      <div class="nav-icon">⚙️</div>
+      <span class="nav-label">Settings</span>
+    </a>
+    <a class="nav-item" data-tab="alerts">
+      <div class="nav-icon">🔔</div>
+      <span class="nav-label">Alerts</span>
+      <span class="nav-badge nb-blue">5</span>
+    </a>
+    <a class="nav-item" data-tab="grow">
+      <div class="nav-icon">🌿</div>
+      <span class="nav-label">Grow Plans</span>
+    </a>
+    <a class="nav-item" data-tab="billing">
+      <div class="nav-icon">💳</div>
+      <span class="nav-label">Billing</span>
+      <span class="nav-badge nb-blue" id="billingNavBadge" style="display:none;">0</span>
+    </a>
+
+    <div class="sb-section" style="margin-top:4px">System</div>
+    <a class="nav-item" data-tab="staff">
+      <div class="nav-icon">👥</div>
+      <span class="nav-label">Staff Access</span>
+    </a>
+
+    <!-- User card at bottom -->
+    <div class="sb-bottom">
+      <div class="sb-user-card">
+        <div class="sb-avatar">AR</div>
+        <div class="sb-user-info">
+          <div class="sb-user-name">Admin RSV</div>
+          <div class="sb-user-role">Administrator</div>
+        </div>
+        <button class="sb-logout" onclick="logout()" title="Logout">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main id="main">
+
+    <!-- Welcome -->
+    <div class="welcome-bar">
+      <div class="welcome-text">
+        <h2>Welcome back, <em>Admin!</em></h2>
+        <p>Here's what's happening at your hydroponic system today.</p>
+      </div>
+      <div class="welcome-pills">
+        <button class="pill-btn pill-admin">
+          <span>Administrator</span>
+        </button>
+        <button class="pill-btn pill-notif" onclick="showToast('5 new alerts','warn')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          5 New Alerts
+        </button>
+      </div>
+    </div>
+
+    <!-- ── OVERVIEW PANEL ── -->
+    <div id="panel-overview" class="panel">
+
+      <!-- Metric cards -->
+      <div class="metrics-grid">
+        <!-- pH -->
+        <div class="mcard">
+          <div class="mcard-top">
+            <div>
+              <div class="mcard-label">pH Level</div>
+              <div style="display:flex;align-items:baseline;gap:5px;margin-top:4px">
+                <div class="mcard-val" id="mc-ph">6.3</div>
+                <div style="font-size:.85rem;font-weight:700;color:var(--accent)">pH</div>
+              </div>
+              <div class="mcard-sub" id="mc-ph-sub">Optimal range · 5.5–7.0</div>
+            </div>
+            <div class="mcard-icon" style="background:rgba(16,185,129,.12)">🧪</div>
+          </div>
+          <div class="mcard-bar-track"><div class="mcard-bar-fill" id="bar-ph" style="width:63%;background:linear-gradient(90deg,#059669,#34d399)"></div></div>
+          <div class="mcard-foot mc-accent" id="foot-ph">✓ Optimal</div>
+        </div>
+        <!-- PPM -->
+        <div class="mcard">
+          <div class="mcard-top">
+            <div>
+              <div class="mcard-label">Nutrients</div>
+              <div style="display:flex;align-items:baseline;gap:5px;margin-top:4px">
+                <div class="mcard-val" id="mc-ppm">1231</div>
+                <div style="font-size:.85rem;font-weight:700;color:var(--cyan)">PPM</div>
+              </div>
+              <div class="mcard-sub">Target: 1200–1500 ppm</div>
+            </div>
+            <div class="mcard-icon" style="background:rgba(6,182,212,.12)">💧</div>
+          </div>
+          <div class="mcard-bar-track"><div class="mcard-bar-fill" id="bar-ppm" style="width:68%;background:linear-gradient(90deg,#0891b2,#67e8f9)"></div></div>
+          <div class="mcard-foot" style="color:var(--cyan)">↗ Within target</div>
+        </div>
+        <!-- Temp -->
+        <div class="mcard">
+          <div class="mcard-top">
+            <div>
+              <div class="mcard-label">Temperature</div>
+              <div style="display:flex;align-items:baseline;gap:5px;margin-top:4px">
+                <div class="mcard-val" id="mc-temp">24.6</div>
+                <div style="font-size:.85rem;font-weight:700;color:var(--orange)">°C</div>
+              </div>
+              <div class="mcard-sub">Optimal: 20–26°C</div>
+            </div>
+            <div class="mcard-icon" style="background:rgba(249,115,22,.12)">🌡️</div>
+          </div>
+          <div class="mcard-bar-track"><div class="mcard-bar-fill" id="bar-temp" style="width:55%;background:linear-gradient(90deg,#ea580c,#fb923c)"></div></div>
+          <div class="mcard-foot" style="color:var(--orange)">Normal range</div>
+        </div>
+        <!-- Humidity -->
+        <div class="mcard">
+          <div class="mcard-top">
+            <div>
+              <div class="mcard-label">Humidity</div>
+              <div style="display:flex;align-items:baseline;gap:5px;margin-top:4px">
+                <div class="mcard-val" id="mc-hum">66</div>
+                <div style="font-size:.85rem;font-weight:700;color:var(--blue)">%</div>
+              </div>
+              <div class="mcard-sub">Optimal: 60–80%</div>
+            </div>
+            <div class="mcard-icon" style="background:rgba(59,130,246,.12)">💨</div>
+          </div>
+          <div class="mcard-bar-track"><div class="mcard-bar-fill" id="bar-hum" style="width:66%;background:linear-gradient(90deg,#1d4ed8,#60a5fa)"></div></div>
+          <div class="mcard-foot" style="color:var(--blue)">Slightly low</div>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div class="charts-row">
+        <!-- Line / Area chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Sensor Flow</div>
+              <div class="chart-subtitle">Weekly sensor values & trends</div>
+            </div>
+            <div class="chart-legend">
+              <div class="cl-item"><div class="cl-dot" style="background:var(--accent)"></div>pH Level</div>
+              <div class="cl-item"><div class="cl-dot" style="background:var(--cyan)"></div>Nutrients</div>
+            </div>
+          </div>
+          <div style="height:220px;position:relative"><canvas id="chart-flow"></canvas></div>
+        </div>
+
+        <!-- Donut chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Status Distribution</div>
+              <div class="chart-subtitle">24h reading results</div>
+            </div>
+          </div>
+          <div class="donut-center">
+            <div style="height:170px;width:170px;position:relative"><canvas id="chart-donut"></canvas></div>
+          </div>
+          <div class="donut-legend">
+            <div class="dl-item"><div class="dl-dot" style="background:var(--accent)"></div><span class="dl-name">Optimal</span><span class="dl-pct">25%</span></div>
+            <div class="dl-item"><div class="dl-dot" style="background:var(--cyan)"></div><span class="dl-name">Normal</span><span class="dl-pct">18%</span></div>
+            <div class="dl-item"><div class="dl-dot" style="background:var(--purple)"></div><span class="dl-name">Stable</span><span class="dl-pct">22%</span></div>
+            <div class="dl-item"><div class="dl-dot" style="background:var(--orange)"></div><span class="dl-name">Warning</span><span class="dl-pct">20%</span></div>
+            <div class="dl-item"><div class="dl-dot" style="background:var(--red)"></div><span class="dl-name">Alert</span><span class="dl-pct" id="dl-alert">15%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom row: Quick controls + Alerts -->
+      <div class="bottom-row">
+        <!-- Quick Controls -->
+        <div class="ctrl-card">
+          <div class="ctrl-header">Hardware Controls</div>
+          <div class="ctrl-items">
+            <div class="ctrl-row">
+              <div class="ctrl-icon" style="background:rgba(16,185,129,.1)">💧</div>
+              <div class="ctrl-info">
+                <div class="ctrl-name">Water Pump</div>
+                <div class="ctrl-desc">Circulation system</div>
+              </div>
+              <div class="ctrl-status" id="st-pump" style="color:var(--accent)">● ON</div>
+              <label class="sw"><input type="checkbox" class="act-toggle" data-act="pump" checked><div class="sw-track"></div><div class="sw-thumb"></div></label>
+            </div>
+            <div class="ctrl-row">
+              <div class="ctrl-icon" style="background:rgba(6,182,212,.1)">🧪</div>
+              <div class="ctrl-info">
+                <div class="ctrl-name">Nutrient Doser</div>
+                <div class="ctrl-desc">Auto PPM adjustment</div>
+              </div>
+              <div class="ctrl-status" id="st-doser" style="color:var(--accent)">● ON</div>
+              <label class="sw"><input type="checkbox" class="act-toggle" data-act="doser" checked><div class="sw-track"></div><div class="sw-thumb"></div></label>
+            </div>
+            <div class="ctrl-row">
+              <div class="ctrl-icon" style="background:rgba(245,158,11,.1)">💡</div>
+              <div class="ctrl-info">
+                <div class="ctrl-name">Grow Lights</div>
+                <div class="ctrl-desc">Full-spectrum LED</div>
+              </div>
+              <div class="ctrl-status" id="st-lights" style="color:var(--accent)">● ON</div>
+              <label class="sw"><input type="checkbox" class="act-toggle" data-act="lights" checked><div class="sw-track"></div><div class="sw-thumb"></div></label>
+            </div>
+            <div class="ctrl-row">
+              <div class="ctrl-icon" style="background:rgba(239,68,68,.1)">🌀</div>
+              <div class="ctrl-info">
+                <div class="ctrl-name">Exhaust Fan</div>
+                <div class="ctrl-desc">Temp/Humidity control</div>
+              </div>
+              <div class="ctrl-status" id="st-fan" style="color:var(--muted)">● OFF</div>
+              <label class="sw"><input type="checkbox" class="act-toggle" data-act="fan"><div class="sw-track"></div><div class="sw-thumb"></div></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Alerts -->
+        <div class="ctrl-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div class="ctrl-header" style="margin-bottom:0">System Alerts</div>
+            <div class="status-pill sp-green"><div class="pulse-dot"></div>Live</div>
+          </div>
+          <div class="alert-list" id="alert-list">
+            <div class="alert-item a-ok"><span class="a-ico">✅</span>pH level optimal — <strong>6.3 pH</strong></div>
+            <div class="alert-item a-ok"><span class="a-ico">✅</span>Nutrients dalam target — <strong>1231 ppm</strong></div>
+            <div class="alert-item a-warn"><span class="a-ico">⚠️</span>Humidity sedikit rendah — <strong>66%</strong></div>
+            <div class="alert-item a-ok"><span class="a-ico">✅</span>Suhu air normal — <strong>24.6°C</strong></div>
+            <div class="alert-item a-ok"><span class="a-ico">✅</span>Semua sensor terhubung</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /panel-overview -->
+
+    <!-- ── SENSORS PANEL ── -->
+    <div id="panel-sensors" class="panel" style="display:none">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Live Sensor Status</div>
+            <div class="chart-subtitle">Overview koneksi dan kesehatan node</div>
+          </div>
+        </div>
+        <div class="sensor-grid">
+          <div class="sensor-card">
+            <div class="card-title">pH Sensor</div>
+            <div class="card-metric">6.3</div>
+            <div class="card-meta">Koneksi stabil setiap 4 detik.</div>
+            <span class="card-pill pill-ok">Online</span>
+          </div>
+          <div class="sensor-card">
+            <div class="card-title">PPM Sensor</div>
+            <div class="card-metric">1231</div>
+            <div class="card-meta">Nilai nutrisi berada dalam target.</div>
+            <span class="card-pill pill-ok">Online</span>
+          </div>
+          <div class="sensor-card">
+            <div class="card-title">Temperature Sensor</div>
+            <div class="card-metric">24.6°C</div>
+            <div class="card-meta">Suhu air normal dan stabil.</div>
+            <span class="card-pill pill-ok">Online</span>
+          </div>
+          <div class="sensor-card">
+            <div class="card-title">Humidity Sensor</div>
+            <div class="card-metric">66%</div>
+            <div class="card-meta">Kelembapan sedikit rendah, perhatikan ventilasi.</div>
+            <span class="card-pill pill-warn">Attention</span>
+          </div>
+        </div>
+      </div>
+      <div class="ctrl-card" style="margin-top:14px">
+        <div class="ctrl-header">Status Koneksi</div>
+        <p style="font-size:.88rem;color:var(--muted);line-height:1.7;">Semua sensor terhubung. Data dikirim secara real-time dari node IoT setiap beberapa detik.</p>
+      </div>
+    </div>
+
+    <!-- ── CONTROLS PANEL ── -->
+    <div id="panel-control" class="panel" style="display:none">
+      <div class="ctrl-card" style="max-width:800px">
+        <div class="ctrl-header">Hardware Actuators Control</div>
+        <div class="ctrl-items">
+          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(16,185,129,.1)">💧</div><div class="ctrl-info"><div class="ctrl-name">Water Pump</div><div class="ctrl-desc">Main circulation system</div></div><div class="ctrl-status" id="st2-pump" style="color:var(--accent)">● ON</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="pump" checked><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
+          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(6,182,212,.1)">🧪</div><div class="ctrl-info"><div class="ctrl-name">Nutrient Doser</div><div class="ctrl-desc">Auto PPM adjustment</div></div><div class="ctrl-status" id="st2-doser" style="color:var(--accent)">● ON</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="doser" checked><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
+          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(245,158,11,.1)">💡</div><div class="ctrl-info"><div class="ctrl-name">Grow Lights</div><div class="ctrl-desc">Full-spectrum LED</div></div><div class="ctrl-status" id="st2-lights" style="color:var(--accent)">● ON</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="lights" checked><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
+          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(239,68,68,.1)">🌀</div><div class="ctrl-info"><div class="ctrl-name">Exhaust Fan</div><div class="ctrl-desc">Climate control</div></div><div class="ctrl-status" id="st2-fan" style="color:var(--muted)">● OFF</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="fan"><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
+          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(168,85,247,.1)">☀️</div><div class="ctrl-info"><div class="ctrl-name">UV Sterilizer</div><div class="ctrl-desc">Water purification</div></div><div class="ctrl-status" id="st2-uv" style="color:var(--accent)">● ON</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="uv" checked><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
+          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(249,115,22,.1)">🌡️</div><div class="ctrl-info"><div class="ctrl-name">pH Dosing Pump</div><div class="ctrl-desc">Auto pH correction</div></div><div class="ctrl-status" id="st2-ph-pump" style="color:var(--muted)">● OFF</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="ph-pump"><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HISTORY PANEL ── -->
+    <div id="panel-history" class="panel" style="display:none">
+      <div class="ctrl-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div class="ctrl-header" style="margin-bottom:0">Growth History Logs</div>
+          <div style="display:flex;gap:8px">
+            <button onclick="clearHistory()" style="padding:7px 14px;border-radius:9px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red);font-size:.75rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">🗑️ Clear</button>
+            <button onclick="exportCSV()" style="padding:7px 14px;border-radius:9px;background:var(--accent-dim);border:1px solid var(--accent-glow);color:var(--accent);font-size:.75rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">📥 Export CSV</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse">
+            <thead><tr style="border-bottom:1px solid var(--border)">
+              <th style="text-align:left;padding:10px 12px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Timestamp</th>
+              <th style="text-align:left;padding:10px 12px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">pH</th>
+              <th style="text-align:left;padding:10px 12px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">PPM</th>
+              <th style="text-align:left;padding:10px 12px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Temp</th>
+              <th style="text-align:left;padding:10px 12px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Humidity</th>
+              <th style="text-align:left;padding:10px 12px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)">Status</th>
+            </tr></thead>
+            <tbody id="hist-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANALYTICS PANEL ── -->
+    <div id="panel-analytics" class="panel" style="display:none">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px">
+        <div class="ctrl-card" style="text-align:center;padding:20px 14px"><div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px">Avg pH Today</div><div style="font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:var(--accent)" id="avg-ph">6.3</div></div>
+        <div class="ctrl-card" style="text-align:center;padding:20px 14px"><div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px">Avg PPM</div><div style="font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:var(--cyan)" id="avg-ppm">1231</div></div>
+        <div class="ctrl-card" style="text-align:center;padding:20px 14px"><div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px">Normal Events</div><div style="font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:var(--accent)" id="evt-norm">18</div></div>
+        <div class="ctrl-card" style="text-align:center;padding:20px 14px"><div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px">Alert Events</div><div style="font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:var(--red)" id="evt-alrt">6</div></div>
+      </div>
+      <div class="ctrl-card">
+        <div class="ctrl-header">PPM History — Last 24 Readings</div>
+        <div style="height:240px;position:relative"><canvas id="chart-bar"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS PANEL ── -->
+    <div id="panel-settings" class="panel" style="display:none">
+      <div class="ctrl-card" style="max-width:700px">
+        <div class="ctrl-header">Alert Thresholds</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+          <div><label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px">Min pH</label><input type="number" id="s-min-ph" value="5.5" step="0.1" style="width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></div>
+          <div><label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px">Max pH</label><input type="number" id="s-max-ph" value="7.0" step="0.1" style="width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></div>
+          <div><label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px">Min PPM</label><input type="number" id="s-min-ppm" value="800" style="width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></div>
+          <div><label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px">Max PPM</label><input type="number" id="s-max-ppm" value="1800" style="width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button onclick="saveSettings()" style="padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:.82rem;font-weight:700;border:none;cursor:pointer;font-family:'DM Sans',sans-serif">💾 Save Settings</button>
+          <button onclick="resetSettings()" style="padding:10px 20px;border-radius:10px;background:var(--card2);border:1px solid var(--border2);color:var(--muted);font-size:.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BILLING PANEL ── -->
+    <div id="panel-billing" class="panel" style="display:none">
+      <div class="ctrl-card billing-panel">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px">
+          <div>
+            <div class="ctrl-header" style="margin-bottom:0">Billing</div>
+            <p style="font-size:.88rem;color:var(--muted);line-height:1.7;">Kelola langganan, metode pembayaran, dan tagihan terakhir Anda di sini.</p>
+          </div>
+          <button class="staff-btn primary" onclick="changeBillingMethod()">Update Payment</button>
+        </div>
+        <div class="billing-summary">
+          <div class="bill-card">
+            <div class="bill-title">Current Plan</div>
+            <div class="bill-value" id="bill-plan">Pro</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Renewal: <span id="bill-renewal">12 Jun 2026</span></div>
+          </div>
+          <div class="bill-card">
+            <div class="bill-title">Payment Method</div>
+            <div class="bill-value" id="bill-method">Visa •••• 1234</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Next payment due in 9 days</div>
+          </div>
+          <div class="bill-card">
+            <div class="bill-title">Past Due</div>
+            <div class="bill-value" id="bill-due">$34.50</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Outstanding balance</div>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="invoices-table">
+            <thead>
+              <tr>
+                <th>Invoice</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="billing-table-body"></tbody>
+          </table>
+        </div>
+        <div id="billing-requests-container" style="margin-top:18px;">
+          <div class="ctrl-header" style="margin-bottom:10px;font-size:1rem;">Permintaan Paket Masuk</div>
+          <div id="billing-requests-list" class="alert-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ALERTS PANEL ── -->
+    <div id="panel-alerts" class="panel" style="display:none">
+      <div class="ctrl-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px">
+          <div>
+            <div class="ctrl-header" style="margin-bottom:0">Alerts</div>
+            <p style="font-size:.88rem;color:var(--muted);line-height:1.7;">Ringkasan pemberitahuan sistem terbaru dan rekomendasi tindakan.</p>
+          </div>
+        </div>
+        <div class="alert-list">
+          <div class="alert-item a-ok"><span class="a-ico">✅</span>Semua sensor terhubung dengan baik.</div>
+          <div class="alert-item a-warn"><span class="a-ico">⚠️</span>Kelembapan sedikit rendah pada area grow bed 2.</div>
+          <div class="alert-item a-ok"><span class="a-ico">✅</span>pH dan PPM stabil dalam rentang aman.</div>
+          <div class="alert-item a-err"><span class="a-ico">🚨</span>Periksa koneksi dosing pump jika ada gangguan.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── GROW PLANS PANEL ── -->
+    <div id="panel-grow" class="panel" style="display:none">
+      <div class="ctrl-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px">
+          <div>
+            <div class="ctrl-header" style="margin-bottom:0">Grow Plans</div>
+            <p style="font-size:.88rem;color:var(--muted);line-height:1.7;">Atur fase tanam, target nutrisi, dan jadwal pemeliharaan tanaman.</p>
+          </div>
+          <button class="staff-btn primary" onclick="showToast('Grow plan editor coming soon','info')">Edit Plan</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;">
+          <div class="bill-card">
+            <div class="bill-title">Current Crop</div>
+            <div class="bill-value">Lettuce</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Phase: Vegetative</div>
+          </div>
+          <div class="bill-card">
+            <div class="bill-title">Target EC</div>
+            <div class="bill-value">1.25 mS/cm</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Dosage recommended</div>
+          </div>
+          <div class="bill-card">
+            <div class="bill-title">Harvest Est.</div>
+            <div class="bill-value">10 days</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Estimated harvest date</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STAFF ACCESS PANEL ── -->
+    <div id="panel-staff" class="panel" style="display:none">
+      <div class="ctrl-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;flex-wrap:wrap">
+          <div>
+            <div class="ctrl-header" style="margin-bottom:0">Staff Access</div>
+            <p style="font-size:.88rem;color:var(--muted);line-height:1.7;">Kelola akun staf yang memiliki akses ke dashboard dan kontrol sistem.</p>
+          </div>
+          <button class="staff-btn primary" onclick="inviteStaff()">+ Invite Staff</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="staff-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="staff-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="invite-modal" class="modal" onclick="if(event.target===this)closeInviteModal()">
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="invite-modal-title">
+        <div class="modal-header">
+          <div>
+            <div id="invite-modal-title" class="modal-title">Invite New Staff</div>
+            <div style="font-size:.85rem;color:var(--muted);margin-top:4px">Tambah staf baru dengan email untuk akses dashboard.</div>
+          </div>
+          <button class="modal-close" type="button" onclick="closeInviteModal()">×</button>
+        </div>
+        <div class="modal-field">
+          <label for="invite-name">Name</label>
+          <input id="invite-name" type="text" placeholder="Nama staf" />
+        </div>
+        <div class="modal-field">
+          <label for="invite-email">Email</label>
+          <input id="invite-email" type="email" placeholder="email@domain.com" />
+        </div>
+        <div class="modal-actions">
+          <button class="staff-btn secondary" type="button" onclick="closeInviteModal()">Cancel</button>
+          <button class="staff-btn primary" type="button" onclick="submitInviteStaff()">Send Invite</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ── STATE ── */
+const S = {
+  ph:6.3, ppm:1231, temp:24.6, hum:66,
+  history:[],
+  acts:{pump:true,doser:true,lights:true,fan:false,uv:true,'ph-pump':false},
+  charts:{flow:null,donut:null,bar:null},
+  thresholds:{minPH:5.5,maxPH:7.0,minPPM:800,maxPPM:1800},
+  staff:[
+    {name:'Rafi.',role:'Operator',email:'rafi@rsv.id',status:'Active'},
+    {name:'Vico.',role:'Technician',email:'vico@rsv.id',status:'Active'},
+    {name:'Fikri.',role:'Viewer',email:'fkr@rsv.id',status:'Active'},
+  ],
+  billing:{
+    plan:'Pro',
+    renewal:'12 Jun 2026',
+    method:'Visa •••• 8754',
+    due:'$34.50',
+    invoices:[
+      {id:'INV-1091',date:'2026-05-01',amount:'$49.98',status:'Paid'},
+      {id:'INV-1087',date:'2026-04-01',amount:'$39.87',status:'Due'},
+      {id:'INV-1083',date:'2026-03-01',amount:'$29.76',status:'Due'},
+    ],
+    requests:[],
+  },
+};
+
+function renderStaff(){
+  const tbody=document.getElementById('staff-table-body');
+  if(!tbody) return;
+  tbody.innerHTML=S.staff.map((user,index)=>{
+    const pillClass=user.status==='Active'?'active':'paused';
+    return `<tr>
+      <td style="font-family:'DM Sans',sans-serif;color:var(--text);">${user.name}</td>
+      <td style="font-family:'DM Sans',sans-serif;color:var(--muted);">${user.role}</td>
+      <td style="font-family:'DM Sans',sans-serif;color:var(--text);">${user.email}</td>
+      <td><span class="staff-pill ${pillClass}">${user.status}</span></td>
+      <td style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="staff-btn secondary" data-index="${index}" data-action="toggle">${user.status==='Active'?'Pause':'Activate'}</button>
+        <button class="staff-btn secondary" data-index="${index}" data-action="remove">Remove</button>
+      </td>
+    </tr>`;
+  }).join('');
+  document.querySelectorAll('.staff-btn.secondary').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const index=parseInt(btn.dataset.index,10);
+      const action=btn.dataset.action;
+      if(Number.isNaN(index)||!S.staff[index]) return;
+      if(action==='toggle'){
+        S.staff[index].status=S.staff[index].status==='Active'?'Paused':'Active';
+        renderStaff();
+        showToast(`${S.staff[index].name} is now ${S.staff[index].status}`,'info');
+      }
+      if(action==='remove'){
+        const removed=S.staff.splice(index,1)[0];
+        renderStaff();
+        showToast(`${removed.name} removed from staff access`,'warn');
+      }
+    });
+  });
+}
+
+function renderBilling(){
+  const plan=document.getElementById('bill-plan');
+  const renewal=document.getElementById('bill-renewal');
+  const method=document.getElementById('bill-method');
+  const due=document.getElementById('bill-due');
+  const tbody=document.getElementById('billing-table-body');
+  if(plan) plan.textContent=S.billing.plan;
+  if(renewal) renewal.textContent=S.billing.renewal;
+  if(method) method.textContent=S.billing.method;
+  if(due) due.textContent=S.billing.due;
+  if(!tbody) return;
+  tbody.innerHTML=S.billing.invoices.map((inv,index)=>{
+    const statusClass=inv.status==='Paid'?'paid':'due';
+    return `<tr>
+      <td style="font-family:'DM Sans',sans-serif;color:var(--text);">${inv.id}</td>
+      <td style="font-family:'DM Sans',sans-serif;color:var(--muted);">${inv.date}</td>
+      <td style="font-family:'DM Sans',sans-serif;color:var(--text);">${inv.amount}</td>
+      <td><span class="invoice-status ${statusClass}">${inv.status}</span></td>
+      <td style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${inv.status==='Due'?`<button class="invoice-action primary" onclick="payInvoice(${index})">Pay</button>`:`<button class="invoice-action secondary" onclick="downloadInvoice(${index})">Download</button>`}
+      </td>
+    </tr>`;
+  }).join('');
+  renderBillingRequests();
+}
+
+function loadBillingRequests(){
+  try {
+    S.billing.requests = JSON.parse(localStorage.getItem('agroSensePricingRequests') || '[]');
+  } catch(err) {
+    S.billing.requests = [];
+  }
+  updateBillingBadge();
+}
+
+function updateBillingBadge(){
+  const badge=document.getElementById('billingNavBadge');
+  if(!badge) return;
+  const count = Array.isArray(S.billing.requests) ? S.billing.requests.length : 0;
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'flex' : 'none';
+}
+
+function renderBillingRequests(){
+  const list=document.getElementById('billing-requests-list');
+  if(!list) return;
+  if(!Array.isArray(S.billing.requests) || S.billing.requests.length===0){
+    list.innerHTML='<div class="alert-item a-ok"><span class="a-ico">ℹ️</span>Tidak ada permintaan paket baru.</div>';
+    updateBillingBadge();
+    return;
+  }
+  list.innerHTML=S.billing.requests.map((req,index)=>{
+    const date=new Date(req.created).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'});
+    return `<div class="alert-item a-ok" style="flex-direction:column;align-items:flex-start;">
+      <div style="display:flex;justify-content:space-between;width:100%;gap:10px;flex-wrap:wrap;">
+        <div><strong>${req.name}</strong> meminta paket <strong>${req.plan}</strong></div>
+        <button class="invoice-action secondary" style="padding:6px 10px;font-size:.72rem;" onclick="processRequest(${index})">Mark Read</button>
+      </div>
+      <div style="margin-top:8px;color:var(--muted);font-size:.82rem;">${req.company} · ${req.email}</div>
+      <div style="margin-top:8px;color:var(--text);font-size:.82rem;">${req.note || 'Tidak ada catatan tambahan.'}</div>
+      <div style="margin-top:8px;color:var(--muted);font-size:.78rem;">Dikirim: ${date}</div>
+    </div>`;
+  }).join('');
+  updateBillingBadge();
+}
+
+window.processRequest=function(index){
+  if(!Array.isArray(S.billing.requests) || !S.billing.requests[index]) return;
+  const removed=S.billing.requests.splice(index,1)[0];
+  localStorage.setItem('agroSensePricingRequests',JSON.stringify(S.billing.requests));
+  renderBillingRequests();
+  showToast(`Permintaan ${removed.name} ditandai selesai.`,'success');
+}
+
+window.changeBillingMethod=function(){
+  const method=prompt('Update payment method (e.g. Visa •••• 5678):', S.billing.method);
+  if(!method) return;
+  S.billing.method=method;
+  renderBilling();
+  showToast('Payment method updated','success');
+};
+
+window.payInvoice=function(index){
+  const invoice=S.billing.invoices[index];
+  if(!invoice) return;
+  invoice.status='Paid';
+  S.billing.due='$0.00';
+  renderBilling();
+  showToast(`${invoice.id} marked as paid`,'success');
+};
+
+window.downloadInvoice=function(index){
+  const invoice=S.billing.invoices[index];
+  if(!invoice) return;
+  showToast(`${invoice.id} downloaded`,'info');
+};
+
+window.inviteStaff=function(){
+  const modal=document.getElementById('invite-modal');
+  if(!modal) return;
+  document.getElementById('invite-name').value='';
+  document.getElementById('invite-email').value='';
+  modal.classList.add('open');
+  setTimeout(()=>document.getElementById('invite-name').focus(),100);
+};
+
+window.closeInviteModal=function(){
+  document.getElementById('invite-modal')?.classList.remove('open');
+};
+
+window.submitInviteStaff=function(){
+  const name=document.getElementById('invite-name').value.trim();
+  const email=document.getElementById('invite-email').value.trim();
+  if(!name||!email){
+    showToast('Nama dan email wajib diisi.','warn');
+    return;
+  }
+  const emailValid=/^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+  if(!emailValid.test(email)){
+    showToast('Masukkan email yang valid.','warn');
+    return;
+  }
+  S.staff.push({name,email,role:'Viewer',status:'Active'});
+  try{localStorage.setItem('agroSenseStaffUsers',JSON.stringify(S.staff));}catch(_){ }
+  renderStaff();
+  closeInviteModal();
+  showToast(`Undangan dikirim ke ${name}`,'success');
+};
+
+window.loadStaffFromStorage=function(){
+  try{
+    const stored=localStorage.getItem('agroSenseStaffUsers');
+    if(stored) S.staff=JSON.parse(stored);
+  }catch(_){ }
+};
+
+window.applyTheme=function(theme){
+  const isLight=theme==='light';
+  document.body.classList.toggle('light', isLight);
+  const icon=document.getElementById('theme-icon');
+  const btn=document.getElementById('theme-btn');
+  if(btn) btn.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to light theme');
+  if(icon){
+    icon.outerHTML=isLight
+      ? '<svg id="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+      : '<svg id="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z"/></svg>';
+  }
+  localStorage.setItem('agroSenseTheme', theme);
+};
+
+window.toggleTheme=function(){
+  const current=document.body.classList.contains('light') ? 'light' : 'dark';
+  const next=current==='light' ? 'dark' : 'light';
+  applyTheme(next);
+  showToast(`${next==='light' ? 'Light' : 'Dark'} mode aktif`,'success');
+};
+
+window.loadTheme=function(){
+  const saved=localStorage.getItem('agroSenseTheme');
+  applyTheme(saved==='light' ? 'light' : 'dark');
+};
+
+window.loadStaffFromStorage();
+window.loadTheme();
+
+/* ── LOADER ── */
+(function(){
+  const fill=document.getElementById('ld-fill');
+  const stat=document.getElementById('ld-status');
+  const msgs=['Connecting to IoT Node...','Reading sensor values...','Syncing history...','Ready!'];
+  let p=0,mi=0;
+  const t=setInterval(()=>{
+    p+=Math.random()*22; if(p>=100){p=100;clearInterval(t);setTimeout(()=>document.getElementById('loader').classList.add('out'),450);}
+    fill.style.width=Math.min(p,100)+'%';
+    const ni=Math.floor(p/30); if(ni!==mi&&msgs[ni]){mi=ni;stat.textContent=msgs[ni];}
+  },180);
+})();
+
+/* ── CLOCK ── */
+function tick(){
+  const n=new Date();
+  const te=document.getElementById('tb-time');
+  const de=document.getElementById('tb-date');
+  const le=document.getElementById('tb-live-time');
+  if(te)te.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  if(de)de.textContent=n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  if(le)le.textContent=n.toLocaleTimeString('id-ID');
+}
+tick(); setInterval(tick,1000);
+
+/* ── SIDEBAR COLLAPSE ── */
+const sb=document.getElementById('sidebar');
+const tc=document.getElementById('sidebar-toggle');
+let sbOpen=true;
+tc.addEventListener('click',()=>{
+  sbOpen=!sbOpen;
+  sb.style.width=sbOpen?'var(--sb-w)':'0';
+  tc.textContent=sbOpen?'‹':'›';
+});
+
+/* ── NAVIGATION ── */
+const panels={
+  overview:document.getElementById('panel-overview'),
+  sensors: document.getElementById('panel-sensors'),
+  control: document.getElementById('panel-control'),
+  history: document.getElementById('panel-history'),
+  analytics:document.getElementById('panel-analytics'),
+  billing:document.getElementById('panel-billing'),
+  alerts:document.getElementById('panel-alerts'),
+  grow:document.getElementById('panel-grow'),
+  settings:document.getElementById('panel-settings'),
+  staff:document.getElementById('panel-staff'),
+};
+
+function activatePanel(tab){
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  const item=document.querySelector(`.nav-item[data-tab="${tab}"]`);
+  if(item) item.classList.add('active');
+  Object.values(panels).forEach(p=>{if(p)p.style.display='none';});
+  if(panels[tab]){
+    panels[tab].style.display='block';
+    panels[tab].classList.remove('panel'); void panels[tab].offsetWidth; panels[tab].classList.add('panel');
+  }
+  if(tab==='analytics'){setTimeout(initBarChart,100);}
+  if(tab==='history'){renderHistory();}
+  if(tab==='staff'){renderStaff();}
+  if(tab==='billing'){renderBilling();}
+}
+
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click',e=>{
+    e.preventDefault();
+    activatePanel(item.dataset.tab||'overview');
+  });
+});
+
+/* ── METRICS UPDATE ── */
+function setEl(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function setBar(id,pct){const e=document.getElementById(id);if(e)e.style.width=Math.max(0,Math.min(100,pct))+'%';}
+
+function updateMetrics(){
+  setEl('mc-ph', S.ph.toFixed(1));
+  setEl('mc-ppm', Math.round(S.ppm));
+  setEl('mc-temp', S.temp.toFixed(1));
+  setEl('mc-hum', Math.round(S.hum));
+  setBar('bar-ph',  ((S.ph-4)/(9-4))*100);
+  setBar('bar-ppm', (S.ppm/1800)*100);
+  setBar('bar-temp',((S.temp-18)/14)*100);
+  setBar('bar-hum', S.hum);
+
+  const phOk = S.ph>=S.thresholds.minPH && S.ph<=S.thresholds.maxPH;
+  const foot=document.getElementById('foot-ph');
+  if(foot){foot.textContent=phOk?'✓ Optimal':S.ph<S.thresholds.minPH?'⚠ Too Low':'⚠ Too High';foot.className='mcard-foot '+(phOk?'mc-accent':'mc-warn');}
+  const sub=document.getElementById('mc-ph-sub');
+  if(sub)sub.textContent=phOk?'Optimal range · 5.5–7.0':(S.ph<5.5?'Below minimum threshold':'Above maximum threshold');
+}
+
+/* ── SIMULATION ── */
+function simulate(){
+  S.ph  = +Math.min(7.2,Math.max(5.7,S.ph +(Math.random()-.5)*.04)).toFixed(2);
+  S.ppm = +Math.min(1700,Math.max(900,S.ppm+(Math.random()-.5)*22)).toFixed(0);
+  S.temp= +Math.min(30,  Math.max(20, S.temp+(Math.random()-.5)*.2)).toFixed(1);
+  S.hum = +Math.min(88,  Math.max(55, S.hum +(Math.random()-.5)*1.2)).toFixed(0);
+  updateMetrics();
+  pushFlowChart();
+  if(Math.random()>.72) addHistory();
+}
+
+/* ── CHARTS ── */
+const CHART_OPT={
+  responsive:true,maintainAspectRatio:false,
+  interaction:{mode:'index',intersect:false},
+  plugins:{
+    legend:{display:false},
+    tooltip:{backgroundColor:'#0d1a2e',titleColor:'#e8edf5',bodyColor:'#6b7fa3',borderColor:'rgba(16,185,129,.2)',borderWidth:1,padding:10,cornerRadius:10,titleFont:{family:'DM Sans'},bodyFont:{family:'DM Sans'}}
+  },
+  scales:{
+    x:{grid:{color:'rgba(255,255,255,.08)'},ticks:{color:'#9bb8d7',font:{family:'JetBrains Mono',size:10}}},
+    y:{grid:{color:'rgba(255,255,255,.08)'},ticks:{color:'#9bb8d7',font:{family:'JetBrains Mono',size:10}}}
+  }
+};
+
+function initCharts(){
+  /* Flow chart */
+  const hrs=['00:00','02:00','04:00','06:00','08:00','10:00','12:00','14:00','16:00','18:00','20:00','22:00'];
+  const ctx1=document.getElementById('chart-flow');
+  if(ctx1){
+    S.charts.flow=new Chart(ctx1.getContext('2d'),{
+      type:'line',
+      data:{
+        labels:hrs,
+        datasets:[
+          {label:'pH',data:hrs.map(()=>+(6.1+Math.random()*.5).toFixed(2)),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.08)',tension:.5,fill:true,pointRadius:2,pointHoverRadius:5},
+          {label:'PPM/100',data:hrs.map(()=>+((1150+Math.random()*200)/100).toFixed(1)),borderColor:'#06b6d4',backgroundColor:'rgba(6,182,212,0.06)',tension:.5,fill:true,pointRadius:2,pointHoverRadius:5},
+        ]
+      },
+      options:{...CHART_OPT}
+    });
+  }
+  /* Donut */
+  const ctx2=document.getElementById('chart-donut');
+  if(ctx2){
+    S.charts.donut=new Chart(ctx2.getContext('2d'),{
+      type:'doughnut',
+      data:{
+        labels:['Optimal','Normal','Optimal+','Alert','Warning'],
+        datasets:[{data:[25,18,22,15,20],backgroundColor:['#10b981','#06b6d4','#a855f7','#ef4444','#f97316'],borderWidth:0,hoverOffset:5}]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,cutout:'72%',
+        plugins:{
+          legend:{display:false},
+          tooltip:{backgroundColor:'#0d1a2e',titleColor:'#e8edf5',bodyColor:'#6b7fa3',cornerRadius:10,titleFont:{family:'DM Sans'},bodyFont:{family:'DM Sans'}}
+        }
+      }
+    });
+  }
+}
+
+function pushFlowChart(){
+  if(!S.charts.flow)return;
+  const ds=S.charts.flow.data.datasets;
+  ds[0].data.push(S.ph); ds[0].data.shift();
+  ds[1].data.push(+(S.ppm/100).toFixed(1)); ds[1].data.shift();
+  S.charts.flow.update('none');
+}
+
+function initBarChart(){
+  if(S.charts.bar)return;
+  const ctx=document.getElementById('chart-bar');
+  if(!ctx)return;
+  const recent=S.history.slice(0,24).map(r=>r.ppm).reverse();
+  const lbls=S.history.slice(0,24).map(r=>r.timestamp.slice(-8,-3)).reverse();
+  const BAR_COLORS=['#22c55e','#06b6d4','#f97316','#60a5fa'];
+  const barColors=(recent.length?recent:Array.from({length:12},()=>1150+Math.floor(Math.random()*250))).map((_,i)=>BAR_COLORS[i%BAR_COLORS.length]);
+  S.charts.bar=new Chart(ctx.getContext('2d'),{
+    type:'bar',
+    data:{
+      labels:lbls.length?lbls:Array.from({length:12},(_,i)=>i+':00'),
+      datasets:[{label:'PPM',data:recent.length?recent:Array.from({length:12},()=>1150+Math.floor(Math.random()*250)),backgroundColor:barColors,borderColor:barColors,borderWidth:1,borderRadius:6,maxBarThickness:20}]
+    },
+    options:{...CHART_OPT,plugins:{...CHART_OPT.plugins,legend:{display:false}}}
+  });
+}
+
+/* ── HISTORY ── */
+function loadHistory(){
+  try{const s=localStorage.getItem('rsv-hist2');if(s)S.history=JSON.parse(s);}catch(_){}
+  if(!S.history.length){
+    for(let i=23;i>=0;i--) S.history.push({
+      timestamp:new Date(Date.now()-i*3600000).toLocaleString('id-ID'),
+      ph:(6.0+Math.random()*.6).toFixed(2),
+      ppm:1180+Math.floor(Math.random()*150),
+      temp:(23+Math.random()*2).toFixed(1),
+      hum:Math.floor(62+Math.random()*12),
+      status:Math.random()>.15?'Normal':'Alert'
+    });
+    saveHistory();
+  }
+}
+function saveHistory(){try{localStorage.setItem('rsv-hist2',JSON.stringify(S.history));}catch(_){}}
+function addHistory(){
+  S.history.unshift({timestamp:new Date().toLocaleString('id-ID'),ph:S.ph.toFixed(2),ppm:Math.round(S.ppm),temp:S.temp.toFixed(1),hum:Math.round(S.hum),status:(S.ph>=S.thresholds.minPH&&S.ph<=S.thresholds.maxPH)?'Normal':'Alert'});
+  if(S.history.length>100)S.history.pop();
+  saveHistory();
+}
+function renderHistory(){
+  const tb=document.getElementById('hist-body');if(!tb)return;
+  tb.innerHTML=S.history.slice(0,25).map(r=>{
+    const ok=r.status==='Normal';const phOk=parseFloat(r.ph)>=5.5&&parseFloat(r.ph)<=7.0;
+    return`<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted)">${r.timestamp}</td>
+      <td style="padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:700;color:${phOk?'var(--accent)':'var(--yellow)'}">${r.ph}</td>
+      <td style="padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--text)">${r.ppm}</td>
+      <td style="padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--text)">${r.temp}°C</td>
+      <td style="padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--text)">${r.hum}%</td>
+      <td style="padding:10px 12px"><span class="status-pill ${ok?'sp-green':'sp-red'}">${r.status}</span></td>
+    </tr>`;
+  }).join('');
+}
+window.clearHistory=function(){if(!confirm('Hapus semua riwayat?'))return;S.history=[];saveHistory();renderHistory();showToast('Riwayat dibersihkan','info');};
+window.exportCSV=function(){
+  const h=['Timestamp','pH','PPM','Temp','Humidity','Status'];
+  const rows=S.history.map(r=>[r.timestamp,r.ph,r.ppm,r.temp,r.hum,r.status]);
+  const csv=[h,...rows].map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='rsv_history.csv';a.click();
+  showToast('CSV berhasil diunduh!','success');
+};
+
+/* ── ACTUATORS ── */
+function setupActuators(){
+  document.querySelectorAll('.act-toggle,.act-toggle2').forEach(inp=>{
+    const act=inp.dataset.act;
+    if(act)inp.checked=!!S.acts[act];
+    inp.addEventListener('change',()=>{
+      S.acts[act]=inp.checked;
+      const stId='st-'+act; const stId2='st2-'+act;
+      [stId,stId2].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent=inp.checked?'● ON':'● OFF';e.style.color=inp.checked?'var(--accent)':'var(--muted)';}});
+      // sync the other toggle
+      document.querySelectorAll(`.act-toggle,.act-toggle2`).forEach(i=>{if(i!==inp&&i.dataset.act===act)i.checked=inp.checked;});
+      showToast(`${act.replace('-',' ').toUpperCase()} turned ${inp.checked?'ON':'OFF'}`,inp.checked?'success':'warn');
+    });
+  });
+}
+
+/* ── SETTINGS ── */
+window.saveSettings=function(){
+  S.thresholds.minPH =parseFloat(document.getElementById('s-min-ph').value)||5.5;
+  S.thresholds.maxPH =parseFloat(document.getElementById('s-max-ph').value)||7.0;
+  S.thresholds.minPPM=parseInt(document.getElementById('s-min-ppm').value)||800;
+  S.thresholds.maxPPM=parseInt(document.getElementById('s-max-ppm').value)||1800;
+  try{localStorage.setItem('rsv-settings2',JSON.stringify(S.thresholds));}catch(_){}
+  showToast('Pengaturan disimpan!','success');
+};
+window.resetSettings=function(){
+  Object.assign(S.thresholds,{minPH:5.5,maxPH:7.0,minPPM:800,maxPPM:1800});
+  ['s-min-ph','s-max-ph','s-min-ppm','s-max-ppm'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.value=[5.5,7.0,800,1800][i];});
+  showToast('Reset ke default','info');
+};
+
+/* ── TOAST ── */
+const toastQ={};
+window.showToast=function(msg,type='info'){
+  const k=msg+type; if(toastQ[k])return; toastQ[k]=setTimeout(()=>delete toastQ[k],5000);
+  const icons={success:'✅',warn:'⚠️',info:'ℹ️',danger:'🚨'};
+  const cls={success:'t-success',warn:'t-warn',info:'t-info',danger:'t-danger'};
+  const el=document.createElement('div');
+  el.className=`toast ${cls[type]||'t-info'}`;
+  el.innerHTML=`<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  document.body.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transform='translateX(50px)';setTimeout(()=>el.remove(),300);},3000);
+};
+
+window.toggleQuickActions=function(ev){
+  ev?.stopPropagation();
+  const panel=document.getElementById('quick-panel');
+  if(!panel) return;
+  panel.classList.toggle('open');
+  document.querySelector('.tb-qa')?.classList.toggle('open', panel.classList.contains('open'));
+};
+
+window.closeQuickActions=function(){
+  const panel=document.getElementById('quick-panel');
+  if(!panel) return;
+  panel.classList.remove('open');
+  document.querySelector('.tb-qa')?.classList.remove('open');
+};
+
+window.quickAction=function(action){
+  closeQuickActions();
+  if(action==='analytics'){activatePanel('analytics');return;}
+  if(action==='export'){exportCSV();return;}
+  if(action==='invite'){inviteStaff();return;}
+  if(action==='theme'){toggleTheme();return;}
+  showToast('Action not found','warn');
+};
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.quick-actions-wrap')) closeQuickActions();
+});
+
+/* ── LOGOUT ── */
+window.logout=function(){showToast('Logging out...','info');setTimeout(()=>{window.location.href='index.html';},900);};
+
+/* ── INIT ── */
+window.addEventListener('DOMContentLoaded',()=>{
+  loadHistory();
+  setupActuators();
+  initCharts();
+  updateMetrics();
+  setInterval(simulate,4000);
+  loadBillingRequests();
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const requestedTab = window.location.hash.replace('#','') || searchParams.get('tab') || localStorage.getItem('agroSenseSelectedTab');
+  const requestedPlan = localStorage.getItem('agroSenseSelectedPlan');
+  if(requestedPlan){
+    const planMap = { Starter:'Starter', Professional:'Pro', Enterprise:'Enterprise' };
+    S.billing.plan = planMap[requestedPlan] || requestedPlan;
+    localStorage.removeItem('agroSenseSelectedPlan');
+  }
+
+  if(requestedTab){
+    activatePanel(requestedTab);
+    localStorage.removeItem('agroSenseSelectedTab');
+  }
+
+  window.addEventListener('storage', (event) => {
+    if(event.key === 'agroSensePricingRequests'){
+      loadBillingRequests();
+      const active = window.location.hash.replace('#','') || 'overview';
+      if(active === 'billing' || document.querySelector('.nav-item.active')?.dataset.tab === 'billing'){
+        renderBilling();
+      }
+    }
+  });
+
+  // GSAP optional entrance
+  if(typeof gsap!=='undefined'){
+    gsap.from('.mcard',{opacity:0,y:20,duration:.5,stagger:.08,ease:'power2.out',delay:.2});
+    gsap.from('.chart-card,.ctrl-card',{opacity:0,y:16,duration:.45,stagger:.06,ease:'power2.out',delay:.35});
+  }
+});
+
+})();
+</script>
+</body>
+</html>
