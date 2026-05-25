@@ -53,7 +53,6 @@ app.get('/dashboard', (req, res) => {
 
 // Simple logout endpoint (no auth implemented yet)
 app.get('/logout', (req, res) => {
-  // Invalidate session here if you add auth later
   res.redirect('/');
 });
 
@@ -62,7 +61,6 @@ app.get('/logout', (req, res) => {
 /**
  * POST /api/sensor
  * Accepts sensor data from hardware: { ph, ppm, temp, humidity }
- * Broadcasts to frontend via Socket.io with <1s latency
  */
 app.post('/api/sensor', (req, res) => {
   const { ph, ppm, temp, humidity } = req.body;
@@ -86,7 +84,7 @@ app.post('/api/sensor', (req, res) => {
 
   console.log(`[Sensor Data] pH: ${ph}, PPM: ${ppm}, Temp: ${temp}°C, Humidity: ${humidity}%`);
 
-  // Broadcast to all connected frontend clients via Socket.io (<1s latency)
+  // Broadcast to all connected frontend clients via Socket.io
   io.emit('updateSensor', latestSensorData);
 
   // Return success response
@@ -115,19 +113,16 @@ io.on('connection', (socket) => {
 
   /**
    * Handle 'controlRelay' event from frontend
-   * Receives actuator control data and broadcasts to hardware
    */
   socket.on('controlRelay', (data) => {
     console.log(`[Control] Relay command from frontend:`, data);
     
-    // Broadcast control command to hardware devices (consistent payload)
     io.emit('hardwareCommand', {
       relay: data.relay,
       state: data.state,
       timestamp: new Date().toISOString()
     });
 
-    // Acknowledge to frontend
     socket.emit('relayAcknowledged', {
       relay: data.relay,
       state: data.state,
@@ -155,19 +150,17 @@ app.use((err, req, res, next) => {
 });
 
 // ===== Start Server =====
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n╔════════════════════════════════════════════════╗`);
-  console.log(`║  🌱 RSV Hydro-sense IoT Backend Server        ║`);
-  console.log(`║  Port: ${PORT}${' '.repeat(39 - PORT.toString().length)}║`);
-  console.log(`║  Mode: ${process.env.NODE_ENV || 'development'}${' '.repeat(35)}║`);
-  console.log(`╚════════════════════════════════════════════════╝\n`);
-  
-  console.log('📍 Available Routes:');
-  console.log(`   🏠 Landing Page: http://localhost:${PORT}`);
-  console.log(`   📊 Dashboard: http://localhost:${PORT}/dashboard`);
-  console.log(`   📡 API Sensor: POST http://localhost:${PORT}/api/sensor`);
-  console.log(`   📈 Latest Data: http://localhost:${PORT}/api/sensor/latest\n`);
-});
+// Hanya dijalankan di lokal komputer (development), Vercel akan otomatis mengabaikan bagian ini
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3000;
+  server.listen(PORT, '0.0.0.0', () => {
+    console.log(`\n╔════════════════════════════════════════════════╗`);
+    console.log(`║   🌱 RSV Hydro-sense IoT Backend Server        ║`);
+    console.log(`║   Port: ${PORT}${' '.repeat(39 - PORT.toString().length)}║`);
+    console.log(`║   Mode: ${process.env.NODE_ENV || 'development'}${' '.repeat(35)}║`);
+    console.log(`╚════════════════════════════════════════════════╝\n`);
+  });
+}
 
-module.exports = { app, server, io };
+// Export tunggal untuk runtime Serverless Vercel
+module.exports = app;
