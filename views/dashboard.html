@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>RSV Hydro-sense | Dashboard</title>
+<title>RFV Hydro-sense | Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -323,7 +323,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 <!-- LOADER -->
 <div id="loader">
   <div class="ld-ring">🌱</div>
-  <p style="font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;color:#f1f5f9;letter-spacing:-.02em">RSV Hydro-sense</p>
+  <p style="font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;color:#f1f5f9;letter-spacing:-.02em">RFV Hydro-sense</p>
   <p style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#34d399;letter-spacing:.18em;text-transform:uppercase;margin-top:3px">Initializing Dashboard...</p>
   <div class="ld-bar"><div class="ld-fill" id="ld-fill"></div></div>
   <p style="font-size:.68rem;color:rgba(255,255,255,.25);margin-top:7px" id="ld-status">Connecting to IoT Node...</p>
@@ -335,14 +335,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
   <div class="tb-left">
     <div class="logo-wrap">
       <div class="logo-icon">R</div>
-      <div class="logo-text">RSV<br>Hydro-sense</div>
+      <div class="logo-text">RFV<br>Hydro-sense</div>
     </div>
     <button class="tb-collapse" id="sidebar-toggle" title="Toggle sidebar">‹</button>
   </div>
 
   <!-- Breadcrumb -->
   <div class="tb-breadcrumb">
-    <span style="color:var(--muted)">RSV</span>
+    <span style="color:var(--muted)">RFV</span>
     <span style="color:var(--muted2);font-size:.8rem">›</span>
     <span>Administrator</span>
   </div>
@@ -398,7 +398,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
   <div class="tb-user" id="user-pill" onclick="toggleUserMenu(event)">
     <div class="tb-avatar" id="tb-avatar-top">A</div>
     <div class="tb-user-info">
-      <div class="tb-user-name" id="tb-user-name">Admin RSV</div>
+      <div class="tb-user-name" id="tb-user-name">Admin RFV</div>
       <div class="tb-user-role">Administrator</div>
     </div>
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
@@ -472,7 +472,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       <div class="sb-user-card">
         <div class="sb-avatar">AR</div>
         <div class="sb-user-info">
-          <div class="sb-user-name">Admin RSV</div>
+          <div class="sb-user-name">Admin RFV</div>
           <div class="sb-user-role">Administrator</div>
         </div>
         <button class="sb-logout" onclick="logout()" title="Logout">
@@ -809,19 +809,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
             <div style="display:flex;align-items:center;gap:14px;">
               <div class="tb-avatar" id="profile-avatar-char" style="width:56px;height:56px;font-size:1.2rem;">A</div>
               <div>
-                <div style="font-size:1.1rem;font-weight:800;color:var(--text)" id="profile-fullname">Admin RSV</div>
+                <div style="font-size:1.1rem;font-weight:800;color:var(--text)" id="profile-fullname">Admin RFV</div>
                 <div style="font-size:.9rem;color:var(--muted)">Administrator</div>
               </div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <div><label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px">Profile Name</label><input type="text" id="profile-name" value="Admin RSV" style="width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></div>
+              <div><label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px">Profile Name</label><input type="text" id="profile-name" value="Admin RFV" style="width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></div>
               <div><label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px">Profile Icon</label><input type="text" id="profile-avatar" maxlength="2" value="A" placeholder="A" style="width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></div>
             </div>
           </div>
           <div style="padding:16px;border-radius:14px;background:var(--card2);border:1px solid var(--border2);">
             <div style="font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:8px">Account details</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-              <div><div style="font-size:.68rem;color:var(--muted);">Email</div><div id="profile-email" style="margin-top:4px;color:var(--text)">admin@rsv.com</div></div>
+              <div><div style="font-size:.68rem;color:var(--muted);">Email</div><div id="profile-email" style="margin-top:4px;color:var(--text)">admin@rfv.com</div></div>
               <div><div style="font-size:.68rem;color:var(--muted);">Member since</div><div id="profile-joined" style="margin-top:4px;color:var(--text)">Mei 2026</div></div>
             </div>
           </div>
@@ -1028,9 +1028,9 @@ const S = {
   thresholds:{minPH:5.5,maxPH:7.0,minPPM:800,maxPPM:1800},
   growPlan:{crop:'Lettuce',phase:'Vegetative',targetEC:'1.25 mS/cm',harvest:'10 days'},
   staff:[
-    {name:'Rafi.',role:'Manajer',email:'rafi@rsv.id',status:'Active'},
-    {name:'Vico.',role:'Teknisi',email:'vico@rsv.id',status:'Active'},
-    {name:'Fikri.',role:'Web Developer',email:'fkr@rsv.id',status:'Active'},
+    {name:'Rafi.',role:'Manajer',email:'rafi@rfv.id',status:'Active'},
+    {name:'Vico.',role:'Teknisi',email:'vico@rfv.id',status:'Active'},
+    {name:'Fikri.',role:'Web Developer',email:'fkr@rfv.id',status:'Active'},
   ],
   billing:{
     plan:'Pro',
@@ -1045,7 +1045,7 @@ const S = {
     requests:[],
   },
   user:{
-    name:'Admin RSV',
+    name:'Admin RFV',
     role:'Administrator',
     email:'admin@example.com',
     avatar:'A',
@@ -1482,7 +1482,7 @@ function initBarChart(){
 
 /* ── HISTORY ── */
 function loadHistory(){
-  try{const s=localStorage.getItem('rsv-hist2');if(s)S.history=JSON.parse(s);}catch(_){}
+  try{const s=localStorage.getItem('rfv-hist2');if(s)S.history=JSON.parse(s);}catch(_){}
   if(!S.history.length){
     for(let i=23;i>=0;i--) S.history.push({
       timestamp:new Date(Date.now()-i*3600000).toLocaleString('id-ID'),
@@ -1495,7 +1495,7 @@ function loadHistory(){
     saveHistory();
   }
 }
-function saveHistory(){try{localStorage.setItem('rsv-hist2',JSON.stringify(S.history));}catch(_){}}
+function saveHistory(){try{localStorage.setItem('rfv-hist2',JSON.stringify(S.history));}catch(_){}}
 function addHistory(){
   S.history.unshift({timestamp:new Date().toLocaleString('id-ID'),ph:S.ph.toFixed(2),ppm:Math.round(S.ppm),temp:S.temp.toFixed(1),hum:Math.round(S.hum),status:(S.ph>=S.thresholds.minPH&&S.ph<=S.thresholds.maxPH)?'Normal':'Alert'});
   if(S.history.length>100)S.history.pop();
@@ -1520,7 +1520,7 @@ window.exportCSV=function(){
   const h=['Timestamp','pH','PPM','Temp','Humidity','Status'];
   const rows=S.history.map(r=>[r.timestamp,r.ph,r.ppm,r.temp,r.hum,r.status]);
   const csv=[h,...rows].map(r=>r.join(',')).join('\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='rsv_history.csv';a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='rfv_history.csv';a.click();
   showToast('CSV berhasil diunduh!','success');
 };
 
@@ -1548,16 +1548,16 @@ function updateUserUI(){
   const profileEmail=document.getElementById('profile-email');
   const profileJoined=document.getElementById('profile-joined');
   if(topAvatar) topAvatar.textContent = S.user.avatar || 'A';
-  if(topName) topName.textContent = S.user.name || 'Admin RSV';
+  if(topName) topName.textContent = S.user.name || 'Admin RFV';
   if(profileAvatar) profileAvatar.textContent = S.user.avatar || 'A';
-  if(profileName) profileName.textContent = S.user.name || 'Admin RSV';
+  if(profileName) profileName.textContent = S.user.name || 'Admin RFV';
   if(profileEmail) profileEmail.textContent = S.user.email;
   if(profileJoined) profileJoined.textContent = S.user.joined;
 }
 
 function loadThresholdSettings(){
   try{
-    const stored = localStorage.getItem('rsv-settings2');
+    const stored = localStorage.getItem('rfv-settings2');
     if(stored){
       const parsed = JSON.parse(stored);
       Object.assign(S.thresholds, parsed);
@@ -1610,7 +1610,7 @@ window.saveProfile=function(){
 };
 
 window.resetProfile=function(){
-  S.user.name='Admin RSV';
+  S.user.name='Admin RFV';
   S.user.avatar='A';
   try{localStorage.removeItem('agroSenseUserProfile');}catch(_){ }
   updateUserUI();
@@ -1652,7 +1652,7 @@ window.saveSettings=function(){
   S.thresholds.maxPH =parseFloat(document.getElementById('s-max-ph').value)||7.0;
   S.thresholds.minPPM=parseInt(document.getElementById('s-min-ppm').value)||800;
   S.thresholds.maxPPM=parseInt(document.getElementById('s-max-ppm').value)||1800;
-  try{localStorage.setItem('rsv-settings2',JSON.stringify(S.thresholds));}catch(_){}
+  try{localStorage.setItem('rfv-settings2',JSON.stringify(S.thresholds));}catch(_){}
   showToast('Pengaturan disimpan!','success');
 };
 window.resetSettings=function(){
