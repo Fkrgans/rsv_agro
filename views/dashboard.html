@@ -104,12 +104,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .tb-icon-btn:hover{border-color:var(--border2);color:var(--text)}
 .tb-icon-btn .badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:.55rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--sb-bg)}
 
-.tb-user{display:flex;align-items:center;gap:8px;padding:5px 10px 5px 6px;border-radius:10px;background:var(--card);border:1px solid var(--border);cursor:pointer;transition:all .2s}
+.tb-user{display:flex;align-items:center;gap:8px;padding:5px 10px 5px 6px;border-radius:10px;background:var(--card);border:1px solid var(--border);cursor:pointer;transition:all .2s;position:relative}
 .tb-user:hover{border-color:var(--border2)}
 .tb-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#fff;flex-shrink:0}
 .tb-user-info{line-height:1.3}
 .tb-user-name{font-size:.75rem;font-weight:700;color:var(--text)}
 .tb-user-role{font-size:.62rem;color:var(--muted)}
+.user-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:180px;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.18);padding:6px 0;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all .2s ease;z-index:50}
+.user-menu.open{opacity:1;visibility:visible;transform:translateY(0)}
+.user-menu-item{width:100%;text-align:left;padding:10px 14px;border:none;background:transparent;color:var(--text);font-size:.82rem;cursor:pointer;display:block;transition:background .2s}
+.user-menu-item:hover{background:rgba(255,255,255,.05)}
 
 /* ── BODY AREA ─── */
 #body-area{flex:1;display:flex;overflow:hidden}
@@ -391,13 +395,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
   </button>
 
   <!-- User pill -->
-  <div class="tb-user">
-    <div class="tb-avatar">A</div>
+  <div class="tb-user" id="user-pill" onclick="toggleUserMenu(event)">
+    <div class="tb-avatar" id="tb-avatar-top">A</div>
     <div class="tb-user-info">
-      <div class="tb-user-name">Admin RSV</div>
+      <div class="tb-user-name" id="tb-user-name">Admin RSV</div>
       <div class="tb-user-role">Administrator</div>
     </div>
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    <div id="user-menu" class="user-menu" aria-hidden="true">
+      <button type="button" class="user-menu-item" onclick="openProfile()">Profile</button>
+      <button type="button" class="user-menu-item" onclick="openSettings()">Settings</button>
+      <button type="button" class="user-menu-item" onclick="logout()">Logout</button>
+    </div>
   </div>
 </header>
 
@@ -764,7 +773,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 
     <!-- ── SETTINGS PANEL ── -->
     <div id="panel-settings" class="panel" style="display:none">
-      <div class="ctrl-card" style="max-width:700px">
+      <div class="ctrl-card" style="max-width:700px;margin-bottom:18px">
         <div class="ctrl-header">Alert Thresholds</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
           <div><label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px">Min pH</label><input type="number" id="s-min-ph" value="5.5" step="0.1" style="width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></div>
@@ -773,8 +782,53 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
           <div><label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px">Max PPM</label><input type="number" id="s-max-ppm" value="1800" style="width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></div>
         </div>
         <div style="display:flex;gap:10px">
-          <button onclick="saveSettings()" style="padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:.82rem;font-weight:700;border:none;cursor:pointer;font-family:'DM Sans',sans-serif">💾 Save Settings</button>
-          <button onclick="resetSettings()" style="padding:10px 20px;border-radius:10px;background:var(--card2);border:1px solid var(--border2);color:var(--muted);font-size:.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">↺ Reset</button>
+          <button type="button" onclick="saveSettings()" style="padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:.82rem;font-weight:700;border:none;cursor:pointer;font-family:'DM Sans',sans-serif">Save Settings</button>
+          <button type="button" onclick="resetSettings()" style="padding:10px 20px;border-radius:10px;background:var(--card2);border:1px solid var(--border2);color:var(--muted);font-size:.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">↺ Reset</button>
+        </div>
+      </div>
+
+      <div class="ctrl-card" style="max-width:700px">
+        <div class="ctrl-header">User Credentials</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          <div><label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px">Username</label><input type="text" id="auth-username" value="admin" style="width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></div>
+          <div><label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px">Password</label><input type="password" id="auth-password" value="admin123" style="width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button type="button" onclick="saveAuthSettings()" style="padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;font-size:.82rem;font-weight:700;border:none;cursor:pointer;font-family:'DM Sans',sans-serif">Save User</button>
+          <button type="button" onclick="resetAuthSettings()" style="padding:10px 20px;border-radius:10px;background:var(--card2);border:1px solid var(--border2);color:var(--muted);font-size:.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">↺ Reset User</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PROFILE PANEL ── -->
+    <div id="panel-profile" class="panel" style="display:none">
+      <div class="ctrl-card" style="max-width:700px">
+        <div class="ctrl-header">User Profile</div>
+        <div style="display:grid;gap:14px;margin-top:14px">
+          <div style="display:grid;gap:12px;">
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div class="tb-avatar" id="profile-avatar-char" style="width:56px;height:56px;font-size:1.2rem;">A</div>
+              <div>
+                <div style="font-size:1.1rem;font-weight:800;color:var(--text)" id="profile-fullname">Admin RSV</div>
+                <div style="font-size:.9rem;color:var(--muted)">Administrator</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div><label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px">Profile Name</label><input type="text" id="profile-name" value="Admin RSV" style="width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></div>
+              <div><label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px">Profile Icon</label><input type="text" id="profile-avatar" maxlength="2" value="A" placeholder="A" style="width:100%;padding:9px 13px;border-radius:9px;border:1px solid var(--border2);background:var(--card2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none"></div>
+            </div>
+          </div>
+          <div style="padding:16px;border-radius:14px;background:var(--card2);border:1px solid var(--border2);">
+            <div style="font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:8px">Account details</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div><div style="font-size:.68rem;color:var(--muted);">Email</div><div id="profile-email" style="margin-top:4px;color:var(--text)">admin@example.com</div></div>
+              <div><div style="font-size:.68rem;color:var(--muted);">Member since</div><div id="profile-joined" style="margin-top:4px;color:var(--text)">Jan 2025</div></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button type="button" onclick="saveProfile()" style="padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:.82rem;font-weight:700;border:none;cursor:pointer;font-family:'DM Sans',sans-serif">💾 Save Profile</button>
+            <button type="button" onclick="resetProfile()" style="padding:10px 20px;border-radius:10px;background:var(--card2);border:1px solid var(--border2);color:var(--muted);font-size:.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">↺ Reset Profile</button>
+          </div>
         </div>
       </div>
     </div>
@@ -853,22 +907,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
             <div class="ctrl-header" style="margin-bottom:0">Grow Plans</div>
             <p style="font-size:.88rem;color:var(--muted);line-height:1.7;">Atur fase tanam, target nutrisi, dan jadwal pemeliharaan tanaman.</p>
           </div>
-          <button class="staff-btn primary" onclick="showToast('Grow plan editor coming soon','info')">Edit Plan</button>
+          <button class="staff-btn primary" onclick="openGrowPlanEditor()">Edit Plan</button>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;">
           <div class="bill-card">
             <div class="bill-title">Current Crop</div>
-            <div class="bill-value">Lettuce</div>
-            <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Phase: Vegetative</div>
+            <div class="bill-value" id="grow-crop">Lettuce</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Phase: <span id="grow-phase">Vegetative</span></div>
           </div>
           <div class="bill-card">
             <div class="bill-title">Target EC</div>
-            <div class="bill-value">1.25 mS/cm</div>
+            <div class="bill-value" id="grow-ec">1.25 mS/cm</div>
             <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Dosage recommended</div>
           </div>
           <div class="bill-card">
             <div class="bill-title">Harvest Est.</div>
-            <div class="bill-value">10 days</div>
+            <div class="bill-value" id="grow-harvest">10 days</div>
             <div style="font-size:.78rem;color:var(--muted);margin-top:6px">Estimated harvest date</div>
           </div>
         </div>
@@ -898,6 +952,38 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
             </thead>
             <tbody id="staff-table-body"></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="growplan-modal" class="modal" onclick="if(event.target===this)closeGrowPlanEditor()">
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="growplan-modal-title">
+        <div class="modal-header">
+          <div>
+            <div id="growplan-modal-title" class="modal-title">Edit Grow Plan</div>
+            <div style="font-size:.85rem;color:var(--muted);margin-top:4px">Perbarui detail fase tanam dan nutrisi.</div>
+          </div>
+          <button class="modal-close" type="button" onclick="closeGrowPlanEditor()">×</button>
+        </div>
+        <div class="modal-field">
+          <label for="grow-crop-input">Current Crop</label>
+          <input id="grow-crop-input" type="text" placeholder="Nama tanaman" />
+        </div>
+        <div class="modal-field">
+          <label for="grow-phase-input">Phase</label>
+          <input id="grow-phase-input" type="text" placeholder="Phase tanam" />
+        </div>
+        <div class="modal-field">
+          <label for="grow-ec-input">Target EC</label>
+          <input id="grow-ec-input" type="text" placeholder="Target EC" />
+        </div>
+        <div class="modal-field">
+          <label for="grow-harvest-input">Harvest Est.</label>
+          <input id="grow-harvest-input" type="text" placeholder="Perkiraan panen" />
+        </div>
+        <div class="modal-actions">
+          <button class="staff-btn secondary" type="button" onclick="closeGrowPlanEditor()">Cancel</button>
+          <button class="staff-btn primary" type="button" onclick="saveGrowPlan()">Save</button>
         </div>
       </div>
     </div>
@@ -940,10 +1026,11 @@ const S = {
   acts:{pump:true,doser:true,lights:true,fan:false,uv:true,'ph-pump':false},
   charts:{flow:null,donut:null,bar:null},
   thresholds:{minPH:5.5,maxPH:7.0,minPPM:800,maxPPM:1800},
+  growPlan:{crop:'Lettuce',phase:'Vegetative',targetEC:'1.25 mS/cm',harvest:'10 days'},
   staff:[
-    {name:'Rafi.',role:'Operator',email:'rafi@rsv.id',status:'Active'},
-    {name:'Vico.',role:'Technician',email:'vico@rsv.id',status:'Active'},
-    {name:'Fikri.',role:'Viewer',email:'fkr@rsv.id',status:'Active'},
+    {name:'Rafi.',role:'Manajer',email:'rafi@rsv.id',status:'Active'},
+    {name:'Vico.',role:'Teknisi',email:'vico@rsv.id',status:'Active'},
+    {name:'Fikri.',role:'Web Developer',email:'fkr@rsv.id',status:'Active'},
   ],
   billing:{
     plan:'Pro',
@@ -956,6 +1043,15 @@ const S = {
       {id:'INV-1083',date:'2026-03-01',amount:'$29.76',status:'Due'},
     ],
     requests:[],
+  },
+  user:{
+    name:'Admin RSV',
+    role:'Administrator',
+    email:'admin@example.com',
+    avatar:'A',
+    username:'admin',
+    password:'admin123',
+    joined:'Jan 2025',
   },
 };
 
@@ -1123,6 +1219,50 @@ window.submitInviteStaff=function(){
   showToast(`Undangan dikirim ke ${name}`,'success');
 };
 
+function renderGrowPlan(){
+  const crop=document.getElementById('grow-crop');
+  const phase=document.getElementById('grow-phase');
+  const ec=document.getElementById('grow-ec');
+  const harvest=document.getElementById('grow-harvest');
+  if(crop) crop.textContent=S.growPlan.crop;
+  if(phase) phase.textContent=S.growPlan.phase;
+  if(ec) ec.textContent=S.growPlan.targetEC;
+  if(harvest) harvest.textContent=S.growPlan.harvest;
+}
+
+window.openGrowPlanEditor=function(){
+  const modal=document.getElementById('growplan-modal');
+  if(!modal) return;
+  document.getElementById('grow-crop-input').value=S.growPlan.crop;
+  document.getElementById('grow-phase-input').value=S.growPlan.phase;
+  document.getElementById('grow-ec-input').value=S.growPlan.targetEC;
+  document.getElementById('grow-harvest-input').value=S.growPlan.harvest;
+  modal.classList.add('open');
+  setTimeout(()=>document.getElementById('grow-crop-input').focus(),100);
+};
+
+window.closeGrowPlanEditor=function(){
+  document.getElementById('growplan-modal')?.classList.remove('open');
+};
+
+window.saveGrowPlan=function(){
+  const crop=document.getElementById('grow-crop-input').value.trim();
+  const phase=document.getElementById('grow-phase-input').value.trim();
+  const ec=document.getElementById('grow-ec-input').value.trim();
+  const harvest=document.getElementById('grow-harvest-input').value.trim();
+  if(!crop||!phase||!ec||!harvest){
+    showToast('Semua bidang Grow Plan harus diisi.','warn');
+    return;
+  }
+  S.growPlan.crop=crop;
+  S.growPlan.phase=phase;
+  S.growPlan.targetEC=ec;
+  S.growPlan.harvest=harvest;
+  renderGrowPlan();
+  closeGrowPlanEditor();
+  showToast('Grow plan diperbarui.','success');
+};
+
 window.loadStaffFromStorage=function(){
   try{
     const stored=localStorage.getItem('agroSenseStaffUsers');
@@ -1202,6 +1342,7 @@ const panels={
   history: document.getElementById('panel-history'),
   analytics:document.getElementById('panel-analytics'),
   billing:document.getElementById('panel-billing'),
+  profile:document.getElementById('panel-profile'),
   alerts:document.getElementById('panel-alerts'),
   grow:document.getElementById('panel-grow'),
   settings:document.getElementById('panel-settings'),
@@ -1399,6 +1540,112 @@ function setupActuators(){
   });
 }
 
+function updateUserUI(){
+  const topAvatar=document.getElementById('tb-avatar-top');
+  const topName=document.getElementById('tb-user-name');
+  const profileAvatar=document.getElementById('profile-avatar-char');
+  const profileName=document.getElementById('profile-fullname');
+  const profileEmail=document.getElementById('profile-email');
+  const profileJoined=document.getElementById('profile-joined');
+  if(topAvatar) topAvatar.textContent = S.user.avatar || 'A';
+  if(topName) topName.textContent = S.user.name || 'Admin RSV';
+  if(profileAvatar) profileAvatar.textContent = S.user.avatar || 'A';
+  if(profileName) profileName.textContent = S.user.name || 'Admin RSV';
+  if(profileEmail) profileEmail.textContent = S.user.email;
+  if(profileJoined) profileJoined.textContent = S.user.joined;
+}
+
+function loadThresholdSettings(){
+  try{
+    const stored = localStorage.getItem('rsv-settings2');
+    if(stored){
+      const parsed = JSON.parse(stored);
+      Object.assign(S.thresholds, parsed);
+    }
+  }catch(_){ }
+  ['s-min-ph','s-max-ph','s-min-ppm','s-max-ppm'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.value=[S.thresholds.minPH,S.thresholds.maxPH,S.thresholds.minPPM,S.thresholds.maxPPM][i];});
+}
+
+function loadUserProfile(){
+  try{
+    const stored = localStorage.getItem('agroSenseUserProfile');
+    if(stored){
+      const parsed = JSON.parse(stored);
+      Object.assign(S.user, parsed);
+    }
+  }catch(_){ }
+  updateUserUI();
+  const nameField=document.getElementById('profile-name');
+  const avatarField=document.getElementById('profile-avatar');
+  if(nameField) nameField.value=S.user.name;
+  if(avatarField) avatarField.value=S.user.avatar;
+}
+
+function loadAuthSettings(){
+  try{
+    const stored = localStorage.getItem('agroSenseUserAuth');
+    if(stored){
+      const parsed = JSON.parse(stored);
+      Object.assign(S.user, parsed);
+    }
+  }catch(_){ }
+  const usernameField=document.getElementById('auth-username');
+  const passwordField=document.getElementById('auth-password');
+  if(usernameField) usernameField.value=S.user.username;
+  if(passwordField) passwordField.value=S.user.password;
+}
+
+window.saveProfile=function(){
+  const name=document.getElementById('profile-name')?.value.trim();
+  const avatar=document.getElementById('profile-avatar')?.value.trim().slice(0,2);
+  if(!name){
+    showToast('Nama profil tidak boleh kosong','warn');
+    return;
+  }
+  S.user.name=name;
+  S.user.avatar=avatar||'A';
+  try{localStorage.setItem('agroSenseUserProfile',JSON.stringify({name:S.user.name,avatar:S.user.avatar}));}catch(_){ }
+  updateUserUI();
+  showToast('Profil disimpan!','success');
+};
+
+window.resetProfile=function(){
+  S.user.name='Admin RSV';
+  S.user.avatar='A';
+  try{localStorage.removeItem('agroSenseUserProfile');}catch(_){ }
+  updateUserUI();
+  const nameField=document.getElementById('profile-name');
+  const avatarField=document.getElementById('profile-avatar');
+  if(nameField) nameField.value=S.user.name;
+  if(avatarField) avatarField.value=S.user.avatar;
+  showToast('Profil dikembalikan ke default','info');
+};
+
+window.saveAuthSettings=function(){
+  const username=document.getElementById('auth-username')?.value.trim();
+  const password=document.getElementById('auth-password')?.value;
+  if(!username||!password){
+    showToast('Username dan password tidak boleh kosong','warn');
+    return;
+  }
+  S.user.username=username;
+  S.user.password=password;
+  try{localStorage.setItem('agroSenseUserAuth',JSON.stringify({username:S.user.username,password:S.user.password}));}catch(_){ }
+  showToast('Username dan password disimpan','success');
+};
+
+window.resetAuthSettings=function(){
+  const defaults={username:'admin',password:'admin123'};
+  S.user.username=defaults.username;
+  S.user.password=defaults.password;
+  try{localStorage.setItem('agroSenseUserAuth',JSON.stringify(defaults));}catch(_){ }
+  const usernameField=document.getElementById('auth-username');
+  const passwordField=document.getElementById('auth-password');
+  if(usernameField) usernameField.value=S.user.username;
+  if(passwordField) passwordField.value=S.user.password;
+  showToast('User dan password dikembalikan ke default','info');
+};
+
 /* ── SETTINGS ── */
 window.saveSettings=function(){
   S.thresholds.minPH =parseFloat(document.getElementById('s-min-ph').value)||5.5;
@@ -1442,6 +1689,30 @@ window.closeQuickActions=function(){
   document.querySelector('.tb-qa')?.classList.remove('open');
 };
 
+window.toggleUserMenu=function(ev){
+  ev?.stopPropagation();
+  if(ev?.target?.closest('#user-menu')) return;
+  const menu=document.getElementById('user-menu');
+  if(!menu) return;
+  menu.classList.toggle('open');
+};
+
+window.closeUserMenu=function(){
+  const menu=document.getElementById('user-menu');
+  if(!menu) return;
+  menu.classList.remove('open');
+};
+
+window.openProfile=function(){
+  closeUserMenu();
+  activatePanel('profile');
+};
+
+window.openSettings=function(){
+  closeUserMenu();
+  activatePanel('settings');
+};
+
 window.quickAction=function(action){
   closeQuickActions();
   if(action==='analytics'){activatePanel('analytics');return;}
@@ -1453,14 +1724,18 @@ window.quickAction=function(action){
 
 document.addEventListener('click',e=>{
   if(!e.target.closest('.quick-actions-wrap')) closeQuickActions();
+  if(!e.target.closest('#user-pill') && !e.target.closest('#user-menu')) closeUserMenu();
 });
 
 /* ── LOGOUT ── */
-window.logout=function(){showToast('Logging out...','info');setTimeout(()=>{window.location.href='index.html';},900);};
+window.logout=function(){showToast('Logging out...','info');setTimeout(()=>{window.location.href='/logout';},900);};
 
 /* ── INIT ── */
 window.addEventListener('DOMContentLoaded',()=>{
   loadHistory();
+  loadThresholdSettings();
+  loadUserProfile();
+  loadAuthSettings();
   setupActuators();
   initCharts();
   updateMetrics();
@@ -1480,6 +1755,8 @@ window.addEventListener('DOMContentLoaded',()=>{
     activatePanel(requestedTab);
     localStorage.removeItem('agroSenseSelectedTab');
   }
+
+  renderGrowPlan();
 
   window.addEventListener('storage', (event) => {
     if(event.key === 'agroSensePricingRequests'){
