@@ -41,7 +41,18 @@ let latestSensorData = {
   timestamp: new Date().toISOString()
 };
 
-const alertCooldownMs = 5 * 60 * 1000;
+const alertCooldownMs = parseInt(process.env.ALERT_COOLDOWN_MS, 10) || 3 * 1000;
+const alertThresholds = {
+  minPh: parseFloat(process.env.MIN_PH) || 5.5,
+  maxPh: parseFloat(process.env.MAX_PH) || 7.0,
+  minPpm: parseInt(process.env.MIN_PPM, 10) || 800,
+  maxPpm: parseInt(process.env.MAX_PPM, 10) || 1800,
+  minTemp: parseFloat(process.env.MIN_TEMP) || 20,
+  maxTemp: parseFloat(process.env.MAX_TEMP) || 34.2,
+  minHumidity: parseInt(process.env.MIN_HUMIDITY, 10) || 40,
+  maxHumidity: parseInt(process.env.MAX_HUMIDITY, 10) || 75
+};
+
 const lastAlertTime = {
   generic: 0
 };
@@ -158,9 +169,17 @@ function publishMqtt(topic, payload) {
 }
 
 function canSendAlert(key = 'generic') {
-  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) return false;
+  if (!process.env.TELEGRAM_BOT_TOKEN || !process.env.TELEGRAM_CHAT_ID) {
+    console.warn('[Telegram] Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID. Telegram alerts disabled.');
+    return false;
+  }
+
   const now = Date.now();
-  if (now - (lastAlertTime[key] || 0) < alertCooldownMs) return false;
+  if (now - (lastAlertTime[key] || 0) < alertCooldownMs) {
+    console.log(`[Telegram] Alert for ${key} suppressed by cooldown.`);
+    return false;
+  }
+
   lastAlertTime[key] = now;
   return true;
 }
@@ -212,21 +231,31 @@ function sendTelegramMessage(message) {
 
 function createAlertMessage(data) {
   const problems = [];
-  if (data.ph !== undefined && (data.ph < 5.5 || data.ph > 7.0)) {
-    problems.push(`pH ${data.ph.toFixed(1)} (ideal 5.5–7.0)`);
+  if (data.ph !== undefined && (data.ph < alertThresholds.minPh || data.ph > alertThresholds.maxPh)) {
+    problems.push(`pH ${data.ph.toFixed(1)} (ideal ${alertThresholds.minPh}–${alertThresholds.maxPh})`);
   }
-  if (data.ppm !== undefined && (data.ppm < 800 || data.ppm > 1800)) {
-    problems.push(`PPM ${data.ppm} (ideal 800–1800)`);
+  if (data.ppm !== undefined && (data.ppm < alertThresholds.minPpm || data.ppm > alertThresholds.maxPpm)) {
+    problems.push(`PPM ${data.ppm} (ideal ${alertThresholds.minPpm}–${alertThresholds.maxPpm})`);
   }
-  if (data.temp !== undefined && (data.temp < 20 || data.temp > 34.2)) {
-    problems.push(`Temperature ${data.temp.toFixed(1)}°C (ideal 20–34.2°C)`);
+  if (data.temp !== undefined && (data.temp < alertThresholds.minTemp || data.temp > alertThresholds.maxTemp)) {
+    problems.push(`Temperature ${data.temp.toFixed(1)}°C (ideal ${alertThresholds.minTemp}–${alertThresholds.maxTemp}°C)`);
   }
-  if (data.humidity !== undefined && (data.humidity < 40 || data.humidity > 75)) {
-    problems.push(`Humidity ${data.humidity}% (ideal 40–75%)`);
+  if (data.humidity !== undefined && (data.humidity < alertThresholds.minHumidity || data.humidity > alertThresholds.maxHumidity)) {
+    problems.push(`Humidity ${data.humidity}% (ideal ${alertThresholds.minHumidity}–${alertThresholds.maxHumidity}%)`);
   }
   if (!problems.length) return null;
 
-  return `⚠️ RSV Hydro-sense Alert:\n${problems.join('\n')}\n\nLatest readings:\npH: ${data.ph ?? '—'}\nPPM: ${data.ppm ?? '—'}\nTemp: ${data.temp ?? '—'}°C\nHumidity: ${data.humidity ?? '—'}%\nTime: ${new Date(data.timestamp).toLocaleString()}`;
+  const alertTime = new Date(data.timestamp || Date.now()).toLocaleString('id-ID', {
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+
+  return `⚠️ RSV Hydro-sense Alert:\n${problems.join('\n')}\n\nLatest readings:\npH: ${data.ph ?? '—'}\nPPM: ${data.ppm ?? '—'}\nTemp: ${data.temp ?? '—'}°C\nHumidity: ${data.humidity ?? '—'}%\nTime: ${alertTime}`;
 }
 
 // ===== Routes =====
