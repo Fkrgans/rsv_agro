@@ -546,12 +546,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
                 <div class="mcard-val" id="mc-temp">24.6</div>
                 <div style="font-size:.85rem;font-weight:700;color:var(--orange)">°C</div>
               </div>
-              <div class="mcard-sub">Optimal: 20–26°C</div>
+              <div class="mcard-sub" id="mc-temp-sub">Target: 20–34.2°C</div>
             </div>
             <div class="mcard-icon" style="background:rgba(249,115,22,.12)">🌡️</div>
           </div>
           <div class="mcard-bar-track"><div class="mcard-bar-fill" id="bar-temp" style="width:55%;background:linear-gradient(90deg,#ea580c,#fb923c)"></div></div>
-          <div class="mcard-foot" style="color:var(--orange)">Normal range</div>
+          <div class="mcard-foot mc-accent" id="foot-temp">Suhu normal</div>
         </div>
         <!-- Humidity -->
         <div class="mcard">
@@ -562,12 +562,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
                 <div class="mcard-val" id="mc-hum">66</div>
                 <div style="font-size:.85rem;font-weight:700;color:var(--blue)">%</div>
               </div>
-              <div class="mcard-sub">Optimal: 60–80%</div>
+              <div class="mcard-sub" id="mc-hum-sub">Target: 40–75%</div>
             </div>
             <div class="mcard-icon" style="background:rgba(59,130,246,.12)">💨</div>
           </div>
           <div class="mcard-bar-track"><div class="mcard-bar-fill" id="bar-hum" style="width:66%;background:linear-gradient(90deg,#1d4ed8,#60a5fa)"></div></div>
-          <div class="mcard-foot" style="color:var(--blue)">Slightly low</div>
+          <div class="mcard-foot mc-accent" id="foot-hum">Kelembapan ideal</div>
         </div>
       </div>
 
@@ -621,8 +621,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
                 <div class="ctrl-name">Water Pump</div>
                 <div class="ctrl-desc">Circulation system</div>
               </div>
-              <div class="ctrl-status" id="st-pump" style="color:var(--accent)">● ON</div>
-              <label class="sw"><input type="checkbox" class="act-toggle" data-act="pump" checked><div class="sw-track"></div><div class="sw-thumb"></div></label>
+              <div class="ctrl-status" id="st-pump" style="color:var(--muted)">● OFF</div>
+              <label class="sw"><input type="checkbox" class="act-toggle" data-act="pump"><div class="sw-track"></div><div class="sw-thumb"></div></label>
             </div>
             <div class="ctrl-row">
               <div class="ctrl-icon" style="background:rgba(6,182,212,.1)">🧪</div>
@@ -630,8 +630,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
                 <div class="ctrl-name">Nutrient Doser</div>
                 <div class="ctrl-desc">Auto PPM adjustment</div>
               </div>
-              <div class="ctrl-status" id="st-doser" style="color:var(--accent)">● ON</div>
-              <label class="sw"><input type="checkbox" class="act-toggle" data-act="doser" checked><div class="sw-track"></div><div class="sw-thumb"></div></label>
+              <div class="ctrl-status" id="st-doser" style="color:var(--muted)">● OFF</div>
+              <label class="sw"><input type="checkbox" class="act-toggle" data-act="doser"><div class="sw-track"></div><div class="sw-thumb"></div></label>
             </div>
             <div class="ctrl-row">
               <div class="ctrl-icon" style="background:rgba(245,158,11,.1)">💡</div>
@@ -639,8 +639,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
                 <div class="ctrl-name">Grow Lights</div>
                 <div class="ctrl-desc">Full-spectrum LED</div>
               </div>
-              <div class="ctrl-status" id="st-lights" style="color:var(--accent)">● ON</div>
-              <label class="sw"><input type="checkbox" class="act-toggle" data-act="lights" checked><div class="sw-track"></div><div class="sw-thumb"></div></label>
+              <div class="ctrl-status" id="st-lights" style="color:var(--muted)">● OFF</div>
+              <label class="sw"><input type="checkbox" class="act-toggle" data-act="lights"><div class="sw-track"></div><div class="sw-thumb"></div></label>
             </div>
             <div class="ctrl-row">
               <div class="ctrl-icon" style="background:rgba(239,68,68,.1)">🌀</div>
@@ -719,11 +719,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       <div class="ctrl-card" style="max-width:800px">
         <div class="ctrl-header">Hardware Actuators Control</div>
         <div class="ctrl-items">
-          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(16,185,129,.1)">💧</div><div class="ctrl-info"><div class="ctrl-name">Water Pump</div><div class="ctrl-desc">Main circulation system</div></div><div class="ctrl-status" id="st2-pump" style="color:var(--accent)">● ON</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="pump" checked><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
-          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(6,182,212,.1)">🧪</div><div class="ctrl-info"><div class="ctrl-name">Nutrient Doser</div><div class="ctrl-desc">Auto PPM adjustment</div></div><div class="ctrl-status" id="st2-doser" style="color:var(--accent)">● ON</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="doser" checked><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
-          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(245,158,11,.1)">💡</div><div class="ctrl-info"><div class="ctrl-name">Grow Lights</div><div class="ctrl-desc">Full-spectrum LED</div></div><div class="ctrl-status" id="st2-lights" style="color:var(--accent)">● ON</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="lights" checked><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
+          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(16,185,129,.1)">💧</div><div class="ctrl-info"><div class="ctrl-name">Water Pump</div><div class="ctrl-desc">Main circulation system</div></div><div class="ctrl-status" id="st2-pump" style="color:var(--muted)">● OFF</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="pump"><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
+          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(6,182,212,.1)">🧪</div><div class="ctrl-info"><div class="ctrl-name">Nutrient Doser</div><div class="ctrl-desc">Auto PPM adjustment</div></div><div class="ctrl-status" id="st2-doser" style="color:var(--muted)">● OFF</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="doser"><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
+          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(245,158,11,.1)">💡</div><div class="ctrl-info"><div class="ctrl-name">Grow Lights</div><div class="ctrl-desc">Full-spectrum LED</div></div><div class="ctrl-status" id="st2-lights" style="color:var(--muted)">● OFF</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="lights"><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
           <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(239,68,68,.1)">🌀</div><div class="ctrl-info"><div class="ctrl-name">Exhaust Fan</div><div class="ctrl-desc">Climate control</div></div><div class="ctrl-status" id="st2-fan" style="color:var(--muted)">● OFF</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="fan"><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
-          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(168,85,247,.1)">☀️</div><div class="ctrl-info"><div class="ctrl-name">UV Sterilizer</div><div class="ctrl-desc">Water purification</div></div><div class="ctrl-status" id="st2-uv" style="color:var(--accent)">● ON</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="uv" checked><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
+          <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(168,85,247,.1)">☀️</div><div class="ctrl-info"><div class="ctrl-name">UV Sterilizer</div><div class="ctrl-desc">Water purification</div></div><div class="ctrl-status" id="st2-uv" style="color:var(--muted)">● OFF</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="uv"><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
           <div class="ctrl-row"><div class="ctrl-icon" style="background:rgba(249,115,22,.1)">🌡️</div><div class="ctrl-info"><div class="ctrl-name">pH Dosing Pump</div><div class="ctrl-desc">Auto pH correction</div></div><div class="ctrl-status" id="st2-ph-pump" style="color:var(--muted)">● OFF</div><label class="sw"><input type="checkbox" class="act-toggle2" data-act="ph-pump"><div class="sw-track"></div><div class="sw-thumb"></div></label></div>
         </div>
       </div>
@@ -1013,6 +1013,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
   </main>
 </div>
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
 (function(){
 'use strict';
@@ -1021,9 +1022,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 const S = {
   ph:6.3, ppm:1231, temp:24.6, hum:66,
   history:[],
-  acts:{pump:true,doser:true,lights:true,fan:false,uv:true,'ph-pump':false},
+  acts:{pump:false,doser:false,lights:false,fan:false,uv:false,'ph-pump':false},
   charts:{flow:null,donut:null,bar:null},
-  thresholds:{minPH:5.5,maxPH:7.0,minPPM:800,maxPPM:1800},
+  thresholds:{minPH:5.5,maxPH:7.0,minPPM:800,maxPPM:1800,minTemp:20,maxTemp:34.2,minHum:40,maxHum:75},
   growPlan:{crop:'Lettuce',phase:'Vegetative',targetEC:'1.25 mS/cm',harvest:'10 days'},
   staff:[
     {name:'Rafi.',role:'Manajer',email:'rafi@rfv.id',status:'Active'},
@@ -1052,6 +1053,57 @@ const S = {
     joined:'Jan 2025',
   },
 };
+
+const socket = io();
+let lastRealtimeUpdate = 0;
+let isRealtimeConnected = false;
+
+function updateSensorData(data) {
+  if (data.ph !== undefined) S.ph = data.ph;
+  if (data.ppm !== undefined) S.ppm = data.ppm;
+  if (data.temp !== undefined) S.temp = data.temp;
+  if (data.humidity !== undefined) S.hum = data.humidity;
+  updateMetrics();
+  addHistory();
+  pushFlowChart();
+}
+
+socket.on('connect', () => {
+  isRealtimeConnected = true;
+  showToast('Dashboard terhubung ke server','success');
+});
+
+socket.on('disconnect', () => {
+  isRealtimeConnected = false;
+  showToast('Koneksi server terputus','warn');
+});
+
+socket.on('updateSensor', (data) => {
+  if (!data) return;
+  updateSensorData(data);
+  lastRealtimeUpdate = Date.now();
+});
+
+socket.on('sensorAlert', (payload) => {
+  if (payload?.message) showToast(payload.message,'danger');
+});
+
+socket.on('hardwareCommand', (payload) => {
+  if (!payload || typeof payload.relay === 'undefined') return;
+  const relayId = String(payload.relay);
+  const state = !!payload.state;
+  S.acts[relayId] = state;
+  document.querySelectorAll('.act-toggle,.act-toggle2').forEach(inp => {
+    if (inp.dataset.act === relayId) inp.checked = state;
+  });
+  const ids = ['st-' + relayId, 'st2-' + relayId];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = state ? '● ON' : '● OFF';
+    el.style.color = state ? 'var(--accent)' : 'var(--muted)';
+  });
+});
 
 function renderStaff(){
   const tbody=document.getElementById('staff-table-body');
@@ -1380,22 +1432,40 @@ function updateMetrics(){
   setEl('mc-hum', Math.round(S.hum));
   setBar('bar-ph',  ((S.ph-4)/(9-4))*100);
   setBar('bar-ppm', (S.ppm/1800)*100);
-  setBar('bar-temp',((S.temp-18)/14)*100);
-  setBar('bar-hum', S.hum);
+  setBar('bar-temp', ((S.temp - S.thresholds.minTemp) / (S.thresholds.maxTemp - S.thresholds.minTemp)) * 100);
+  setBar('bar-hum', ((S.hum - S.thresholds.minHum) / (S.thresholds.maxHum - S.thresholds.minHum)) * 100);
 
   const phOk = S.ph>=S.thresholds.minPH && S.ph<=S.thresholds.maxPH;
+  const tempOk = S.temp>=S.thresholds.minTemp && S.temp<=S.thresholds.maxTemp;
+  const humOk = S.hum>=S.thresholds.minHum && S.hum<=S.thresholds.maxHum;
   const foot=document.getElementById('foot-ph');
   if(foot){foot.textContent=phOk?'✓ Optimal':S.ph<S.thresholds.minPH?'⚠ Too Low':'⚠ Too High';foot.className='mcard-foot '+(phOk?'mc-accent':'mc-warn');}
   const sub=document.getElementById('mc-ph-sub');
-  if(sub)sub.textContent=phOk?'Optimal range · 5.5–7.0':(S.ph<5.5?'Below minimum threshold':'Above maximum threshold');
+  if(sub)sub.textContent=phOk?'Optimal range · 5.5–7.0':(S.ph<S.thresholds.minPH?'Below minimum threshold':'Above maximum threshold');
+
+  const tempSub=document.getElementById('mc-temp-sub');
+  if(tempSub) tempSub.textContent=tempOk?`Ideal ${S.thresholds.minTemp}–${S.thresholds.maxTemp}°C`:`Target ${S.thresholds.minTemp}–${S.thresholds.maxTemp}°C`;
+  const tempFoot=document.getElementById('foot-temp');
+  if(tempFoot){
+    tempFoot.textContent=tempOk?'Suhu normal':S.temp<S.thresholds.minTemp?'Suhu terlalu rendah':'Suhu terlalu tinggi';
+    tempFoot.className='mcard-foot '+(tempOk?'mc-accent':'mc-warn');
+  }
+
+  const humSub=document.getElementById('mc-hum-sub');
+  if(humSub) humSub.textContent=humOk?`Ideal ${S.thresholds.minHum}–${S.thresholds.maxHum}%`:`Target ${S.thresholds.minHum}–${S.thresholds.maxHum}%`;
+  const humFoot=document.getElementById('foot-hum');
+  if(humFoot){
+    humFoot.textContent=humOk?'Kelembapan ideal':S.hum<S.thresholds.minHum?'Kelembapan rendah':'Kelembapan tinggi';
+    humFoot.className='mcard-foot '+(humOk?'mc-accent':'mc-warn');
+  }
 }
 
 /* ── SIMULATION ── */
 function simulate(){
   S.ph  = +Math.min(7.2,Math.max(5.7,S.ph +(Math.random()-.5)*.04)).toFixed(2);
   S.ppm = +Math.min(1700,Math.max(900,S.ppm+(Math.random()-.5)*22)).toFixed(0);
-  S.temp= +Math.min(30,  Math.max(20, S.temp+(Math.random()-.5)*.2)).toFixed(1);
-  S.hum = +Math.min(88,  Math.max(55, S.hum +(Math.random()-.5)*1.2)).toFixed(0);
+  S.temp= +Math.min(S.thresholds.maxTemp, Math.max(S.thresholds.minTemp, S.temp+(Math.random()-.5)*.2)).toFixed(1);
+  S.hum = +Math.min(S.thresholds.maxHum, Math.max(S.thresholds.minHum, S.hum +(Math.random()-.5)*1.2)).toFixed(0);
   updateMetrics();
   pushFlowChart();
   if(Math.random()>.72) addHistory();
@@ -1427,6 +1497,8 @@ function initCharts(){
         datasets:[
           {label:'pH',data:hrs.map(()=>+(6.1+Math.random()*.5).toFixed(2)),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.08)',tension:.5,fill:true,pointRadius:2,pointHoverRadius:5},
           {label:'PPM/100',data:hrs.map(()=>+((1150+Math.random()*200)/100).toFixed(1)),borderColor:'#06b6d4',backgroundColor:'rgba(6,182,212,0.06)',tension:.5,fill:true,pointRadius:2,pointHoverRadius:5},
+          {label:'Temperature',data:hrs.map(()=>+(23+Math.random()*6).toFixed(1)),borderColor:'#f97316',backgroundColor:'rgba(249,115,22,0.08)',tension:.5,fill:true,pointRadius:2,pointHoverRadius:5},
+          {label:'Humidity',data:hrs.map(()=>+(55+Math.random()*20).toFixed(0)),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.08)',tension:.5,fill:true,pointRadius:2,pointHoverRadius:5},
         ]
       },
       options:{...CHART_OPT}
@@ -1457,6 +1529,8 @@ function pushFlowChart(){
   const ds=S.charts.flow.data.datasets;
   ds[0].data.push(S.ph); ds[0].data.shift();
   ds[1].data.push(+(S.ppm/100).toFixed(1)); ds[1].data.shift();
+  if(ds[2]){ ds[2].data.push(S.temp); ds[2].data.shift(); }
+  if(ds[3]){ ds[3].data.push(S.hum); ds[3].data.shift(); }
   S.charts.flow.update('none');
 }
 
@@ -1526,7 +1600,10 @@ window.exportCSV=function(){
 function setupActuators(){
   document.querySelectorAll('.act-toggle,.act-toggle2').forEach(inp=>{
     const act=inp.dataset.act;
-    if(act)inp.checked=!!S.acts[act];
+    const state = act ? !!S.acts[act] : false;
+    inp.checked = state;
+    const stIds = ['st-'+act, 'st2-'+act];
+    stIds.forEach(id=>{const e=document.getElementById(id);if(e){e.textContent=state?'● ON':'● OFF';e.style.color=state?'var(--accent)':'var(--muted)';}});
     inp.addEventListener('change',()=>{
       S.acts[act]=inp.checked;
       const stId='st-'+act; const stId2='st2-'+act;
@@ -1534,6 +1611,13 @@ function setupActuators(){
       // sync the other toggle
       document.querySelectorAll(`.act-toggle,.act-toggle2`).forEach(i=>{if(i!==inp&&i.dataset.act===act)i.checked=inp.checked;});
       showToast(`${act.replace('-',' ').toUpperCase()} turned ${inp.checked?'ON':'OFF'}`,inp.checked?'success':'warn');
+      if(act){
+        fetch('/api/hardware/relay', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ relay: act, state: inp.checked })
+        }).catch(()=>{showToast('Gagal mengirim perintah relay','danger');});
+      }
     });
   });
 }
@@ -1737,7 +1821,21 @@ window.addEventListener('DOMContentLoaded',()=>{
   setupActuators();
   initCharts();
   updateMetrics();
-  setInterval(simulate,4000);
+  fetch('/api/sensor/latest')
+    .then((res) => res.json())
+    .then((data) => {
+      if (data && data.temp !== undefined && data.humidity !== undefined) {
+        updateSensorData(data);
+      }
+    })
+    .catch(() => {
+      showToast('Tidak dapat mengambil data sensor awal','warn');
+    });
+  setInterval(() => {
+    if (!isRealtimeConnected) {
+      simulate();
+    }
+  }, 4000);
   loadBillingRequests();
 
   const searchParams = new URLSearchParams(window.location.search);

@@ -62,11 +62,39 @@ npm install
 ```
 
 3. **Configure environment variables**
-Edit `.env` file and update your server configuration:
+Copy `.env.example` to `.env` and update your server configuration:
+```bash
+copy .env.example .env
+```
+
+Then edit `.env` and fill in your values:
 ```env
 PORT=3000
 NODE_ENV=development
+
+# MQTT broker settings
+MQTT_BROKER_URL=mqtt://broker.hivemq.com:1883
+MQTT_USERNAME=
+MQTT_PASSWORD=
+MQTT_CLIENT_ID=agro-sense-server
+MQTT_SENSOR_TOPIC=agro_sense/sensor
+MQTT_RELAY_COMMAND_TOPIC=agro_sense/relay/set
+MQTT_RELAY_STATE_TOPIC=agro_sense/relay/state
+
+# Telegram Bot settings
+TELEGRAM_BOT_TOKEN=YOUR_TELEGRAM_BOT_TOKEN
+TELEGRAM_CHAT_ID=YOUR_TELEGRAM_CHAT_ID
 ```
+
+### Telegram Bot Setup
+1. Cari `@BotFather` di Telegram.
+2. Kirim `/newbot` dan ikuti petunjuk untuk membuat bot baru.
+3. Simpan `BOT_TOKEN` yang diberikan BotFather.
+4. Untuk mendapatkan `CHAT_ID`:
+   - Kirim pesan ke bot baru Anda.
+   - Buka `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates` di browser.
+   - Cari nilai `chat->id` pada respons JSON.
+5. Masukkan nilai itu ke `TELEGRAM_BOT_TOKEN` dan `TELEGRAM_CHAT_ID` di `.env`.
 
 4. **Start the server**
 ```bash
@@ -123,17 +151,25 @@ Response:
 }
 ```
 
-## 🔌 Hardware Setup (ESP32/NodeMCU)
+## 🔌 Hardware Setup (ESP32/NodeMCU / ESP8266)
 
 ### Arduino Sketch Configuration
 
-1. Install Arduino IDE and ESP32 boards
-2. Open `hardware/esp32_nodemcu.ino`
-3. Configure WiFi credentials:
+1. Install Arduino IDE and ESP32/ESP8266 boards
+2. If you use ESP32/NodeMCU with HTTP, open `hardware/esp32_nodemcu.ino`
+3. If you want MQTT with ESP8266 + DHT + relay + buzzer, open `hardware/esp8266_mqtt_dht_relay_buzzer.ino`
+4. Configure WiFi credentials:
 ```cpp
 const char* ssid = "YOUR_SSID";
 const char* password = "YOUR_PASSWORD";
-const char* serverUrl = "http://192.168.1.100:3000/api/sensor";
+```
+5. For MQTT, also configure broker host and topic in `hardware/esp8266_mqtt_dht_relay_buzzer.ino`:
+```cpp
+const char* mqttBrokerHost = "broker.hivemq.com";
+const int mqttPort = 1883;
+const char* sensorTopic = "agro_sense/sensor";
+const char* relayTopic = "agro_sense/relay/set";
+const char* relayStateTopic = "agro_sense/relay/state";
 ```
 
 4. Adjust sensor pins as needed:
