@@ -402,17 +402,14 @@ app.use((err, req, res, next) => {
 });
 
 // ===== Start Server =====
-// Hanya dijalankan di lokal komputer (development), Vercel akan otomatis mengabaikan bagian ini
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 3000;
-  server.listen(PORT, '0.0.0.0', () => {
-    console.log(`\n╔════════════════════════════════════════════════╗`);
-    console.log(`║   🌱 RSV Hydro-sense IoT Backend Server        ║`);
-    console.log(`║   Port: ${PORT}${' '.repeat(39 - PORT.toString().length)}║`);
-    console.log(`║   Mode: ${process.env.NODE_ENV || 'development'}${' '.repeat(35)}║`);
-    console.log(`╚════════════════════════════════════════════════╝\n`);
-  });
-}
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`\n╔════════════════════════════════════════════════╗`);
+  console.log(`║   🌱 RSV Hydro-sense IoT Backend Server        ║`);
+  console.log(`║   Port: ${PORT}${' '.repeat(39 - PORT.toString().length)}║`);
+  console.log(`║   Mode: ${process.env.NODE_ENV || 'development'}${' '.repeat(35)}║`);
+  console.log(`╚════════════════════════════════════════════════╝\n`);
+});
 
 // Export tunggal untuk runtime Serverless Vercel
 module.exports = app;
