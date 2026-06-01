@@ -26,6 +26,7 @@
           "iframe[referrerpolicy=no-referrer-when-downgrade]"
         ]
       }
-    ]
+    ],
+    "button-type": "off"
   }
 }
