@@ -246,8 +246,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .staff-pill.paused{background:rgba(245,158,11,.12);color:var(--yellow)}
 .staff-btn{padding:10px 16px;border-radius:10px;border:none;font-size:.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
 .staff-btn.primary{background:linear-gradient(135deg,#059669,#10b981);color:#fff}
-.staff-btn.secondary{background:var(--card2);border:1px solid var(--border2);color:var(--muted)}
-.staff-btn:hover{transform:translateY(-1px)}
+.staff-btn.secondary{background:transparent;border:1px solid rgba(255,255,255,.12);color:var(--text)}
+.staff-btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.photo-panel{display:grid;grid-template-columns:1fr 380px;gap:22px;align-items:start}
+.photo-panel__info{display:flex;flex-direction:column;gap:18px}
+.photo-panel__title{font-size:1.05rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.photo-panel__desc{font-size:.95rem;line-height:1.75;color:var(--muted);margin-bottom:16px;max-width:500px}
+.photo-actions{display:flex;flex-wrap:wrap;gap:12px}
+.file-button{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 18px;border-radius:14px;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:.9rem;font-weight:700;cursor:pointer;user-select:none}
+.file-button input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.photo-meta{font-size:.82rem;color:var(--muted);line-height:1.6;padding:14px 0 0}
+.photo-preview-card{display:flex;flex-direction:column;gap:12px}
+.photo-preview-label{font-size:.88rem;font-weight:700;color:var(--text)}
+.photo-preview-wrapper{background:var(--bg);border:1px solid rgba(255,255,255,.08);border-radius:22px;min-height:280px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.photo-preview-wrapper img{max-width:100%;max-height:100%;object-fit:cover;display:none}
+.photo-placeholder{color:var(--muted);text-align:center;padding:28px 22px;font-size:.92rem;line-height:1.7}
+.photo-note{font-size:.8rem;color:var(--muted);line-height:1.6}
+@media(max-width:960px){.photo-panel{grid-template-columns:1fr}}
 .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);opacity:0;visibility:hidden;transition:opacity .2s ease,visibility .2s ease;z-index:1000}
 .modal.open{opacity:1;visibility:visible}
 .modal-box{width:min(100%,420px);background:var(--bg);border:1px solid var(--border);border-radius:24px;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:24px;color:var(--text)}
@@ -583,6 +598,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
             <div class="chart-legend">
               <div class="cl-item"><div class="cl-dot" style="background:var(--accent)"></div>pH Level</div>
               <div class="cl-item"><div class="cl-dot" style="background:var(--cyan)"></div>Nutrients</div>
+              <div class="cl-item"><div class="cl-dot" style="background:var(--orange)"></div>Temperature</div>
+              <div class="cl-item"><div class="cl-dot" style="background:var(--blue)"></div>Humidity</div>
             </div>
           </div>
           <div style="height:220px;position:relative"><canvas id="chart-flow"></canvas></div>
@@ -670,6 +687,29 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
         </div>
       </div>
 
+      <div class="ctrl-card" style="margin-top:18px">
+        <div class="ctrl-header">Foto Kebun Terbaru</div>
+        <div class="photo-panel">
+          <div class="photo-panel__info">
+            <div class="photo-panel__title">Unggah dan lihat foto lapangan</div>
+            <p class="photo-panel__desc">Tambahkan gambar sistem hidroponik, tanaman, atau instalasi sensor untuk dokumentasi visual dan monitoring.</p>
+            <div class="photo-actions">
+              <label class="file-button">Unggah foto<input type="file" id="photoInput" accept="image/*" onchange="previewPhoto(event)" /></label>
+              <button type="button" class="staff-btn secondary" onclick="clearPhoto()">Hapus Foto</button>
+            </div>
+            <div class="photo-meta" id="photoMeta">Foto terakhir akan ditampilkan secara otomatis setelah berhasil diunggah.</div>
+          </div>
+          <div class="photo-preview-card">
+            <div class="photo-preview-label">Preview Foto</div>
+            <div class="photo-preview-wrapper">
+              <img id="photoPreview" alt="Preview Foto" src="" style="display: none;" />
+              <div id="photoPlaceholder" class="photo-placeholder">Belum ada foto dipilih. Klik tombol Unggah foto untuk menampilkan pratinjau di sini.</div>
+            </div>
+            <div class="photo-note">Ukuran maksimal file 5MB. Format yang didukung: JPG, PNG, GIF, WebP.</div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /panel-overview -->
 
     <!-- ── SENSORS PANEL ── -->
@@ -684,33 +724,33 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
         <div class="sensor-grid">
           <div class="sensor-card">
             <div class="card-title">pH Sensor</div>
-            <div class="card-metric">6.3</div>
-            <div class="card-meta">Koneksi stabil setiap 4 detik.</div>
-            <span class="card-pill pill-ok">Online</span>
+            <div class="card-metric" id="sensor-ph-value">6.3</div>
+            <div class="card-meta" id="sensor-ph-meta">Koneksi stabil setiap 4 detik.</div>
+            <span class="card-pill pill-ok" id="sensor-ph-status">Online</span>
           </div>
           <div class="sensor-card">
             <div class="card-title">PPM Sensor</div>
-            <div class="card-metric">1231</div>
-            <div class="card-meta">Nilai nutrisi berada dalam target.</div>
-            <span class="card-pill pill-ok">Online</span>
+            <div class="card-metric" id="sensor-ppm-value">1231</div>
+            <div class="card-meta" id="sensor-ppm-meta">Nilai nutrisi berada dalam target.</div>
+            <span class="card-pill pill-ok" id="sensor-ppm-status">Online</span>
           </div>
           <div class="sensor-card">
             <div class="card-title">Temperature Sensor</div>
-            <div class="card-metric">24.6°C</div>
-            <div class="card-meta">Suhu air normal dan stabil.</div>
-            <span class="card-pill pill-ok">Online</span>
+            <div class="card-metric" id="sensor-temp-value">24.6°C</div>
+            <div class="card-meta" id="sensor-temp-meta">Suhu air normal dan stabil.</div>
+            <span class="card-pill pill-ok" id="sensor-temp-status">Online</span>
           </div>
           <div class="sensor-card">
             <div class="card-title">Humidity Sensor</div>
-            <div class="card-metric">66%</div>
-            <div class="card-meta">Kelembapan sedikit rendah, perhatikan ventilasi.</div>
-            <span class="card-pill pill-warn">Attention</span>
+            <div class="card-metric" id="sensor-hum-value">66%</div>
+            <div class="card-meta" id="sensor-hum-meta">Kelembapan sedikit rendah, perhatikan ventilasi.</div>
+            <span class="card-pill pill-warn" id="sensor-hum-status">Attention</span>
           </div>
         </div>
       </div>
       <div class="ctrl-card" style="margin-top:14px">
         <div class="ctrl-header">Status Koneksi</div>
-        <p style="font-size:.88rem;color:var(--muted);line-height:1.7;">Semua sensor terhubung. Data dikirim secara real-time dari node IoT setiap beberapa detik.</p>
+        <p id="sensor-panel-status" style="font-size:.88rem;color:var(--muted);line-height:1.7;">Semua sensor terhubung. Data dikirim secara real-time dari node IoT setiap beberapa detik.</p>
       </div>
     </div>
 
@@ -1071,11 +1111,13 @@ function updateSensorData(data) {
 socket.on('connect', () => {
   isRealtimeConnected = true;
   showToast('Dashboard terhubung ke server','success');
+  updateSensorPanel();
 });
 
 socket.on('disconnect', () => {
   isRealtimeConnected = false;
   showToast('Koneksi server terputus','warn');
+  updateSensorPanel();
 });
 
 socket.on('updateSensor', (data) => {
@@ -1341,6 +1383,130 @@ window.toggleTheme=function(){
   showToast(`${next==='light' ? 'Light' : 'Dark'} mode aktif`,'success');
 };
 
+window.previewPhoto=function(event){
+  const file=event.target?.files?.[0];
+  const preview=document.getElementById('photoPreview');
+  const placeholder=document.getElementById('photoPlaceholder');
+  const meta=document.getElementById('photoMeta');
+  if(!preview || !placeholder || !meta) return;
+
+  if(window.currentPhotoUrl && window.currentPhotoUrl.startsWith('blob:')){
+    URL.revokeObjectURL(window.currentPhotoUrl);
+  }
+
+  if(file && file.type.startsWith('image/')){
+    const objectUrl=URL.createObjectURL(file);
+    window.currentPhotoUrl=objectUrl;
+    preview.src=objectUrl;
+    preview.style.display='block';
+    placeholder.style.display='none';
+    meta.textContent='Mengunggah foto...';
+    uploadPhoto(file, preview, placeholder, meta);
+  } else {
+    preview.src='';
+    preview.style.display='none';
+    placeholder.style.display='block';
+    showToast('Pilih file gambar yang valid','warn');
+  }
+};
+
+window.uploadPhoto=async function(file, preview, placeholder, meta){
+  try {
+    const formData = new FormData();
+    formData.append('photo', file);
+    const response = await fetch('/api/photo', {
+      method: 'POST',
+      body: formData
+    });
+    const json = await response.json();
+    if(response.ok && json.url){
+      preview.src = json.url;
+      window.currentPhotoUrl = json.url;
+      preview.style.display = 'block';
+      placeholder.style.display = 'none';
+      meta.textContent = 'Foto terakhir berhasil disimpan ke server.';
+      showToast('Foto tersimpan di server','success');
+    } else {
+      meta.textContent = 'Gagal mengunggah. Coba lagi.';
+      preview.style.display = 'none';
+      placeholder.style.display = 'block';
+      showToast(json.message || 'Upload foto gagal','warn');
+    }
+  } catch (err) {
+    console.error(err);
+    meta.textContent = 'Gagal mengunggah. Coba lagi nanti.';
+    preview.style.display = 'none';
+    placeholder.style.display = 'block';
+    showToast('Upload foto gagal','warn');
+  }
+};
+
+window.loadPhotoPreview=async function(){
+  const preview=document.getElementById('photoPreview');
+  const placeholder=document.getElementById('photoPlaceholder');
+  const meta=document.getElementById('photoMeta');
+  if(!preview || !placeholder || !meta) return;
+
+  try {
+    const response = await fetch('/api/photo');
+    if (!response.ok) throw new Error('No photo');
+    const json = await response.json();
+    if (json.url){
+      preview.src = json.url;
+      preview.style.display = 'block';
+      placeholder.style.display = 'none';
+      window.currentPhotoUrl = json.url;
+      meta.textContent = 'Menampilkan foto terakhir yang tersimpan di server.';
+    } else {
+      preview.style.display = 'none';
+      placeholder.style.display = 'block';
+      meta.textContent = 'Belum ada foto tersimpan.';
+    }
+  } catch (_){
+    preview.style.display = 'none';
+    placeholder.style.display = 'block';
+    meta.textContent = 'Belum ada foto tersimpan.';
+  }
+};
+
+window.clearPhoto=async function(){
+  const input=document.getElementById('photoInput');
+  const preview=document.getElementById('photoPreview');
+  const placeholder=document.getElementById('photoPlaceholder');
+  const meta=document.getElementById('photoMeta');
+  if(!preview || !placeholder || !meta) return;
+
+  try {
+    const response = await fetch('/api/photo', { method:'DELETE' });
+    const json = await response.json();
+    if(response.ok){
+      if(json.url){
+        preview.src = json.url;
+        preview.style.display = 'block';
+        placeholder.style.display = 'none';
+        meta.textContent = 'Menampilkan foto tersimpan sebelumnya.';
+      } else {
+        preview.src = '';
+        preview.style.display = 'none';
+        placeholder.style.display = 'block';
+        meta.textContent = json.message || 'Foto dihapus dari server.';
+      }
+      showToast('Foto dihapus','info');
+    } else {
+      showToast(json.message || 'Tidak bisa menghapus foto','warn');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Gagal menghapus foto','warn');
+  }
+
+  if(window.currentPhotoUrl && window.currentPhotoUrl.startsWith('blob:')){
+    URL.revokeObjectURL(window.currentPhotoUrl);
+  }
+  window.currentPhotoUrl=null;
+  if(input) input.value='';
+};
+
 window.loadTheme=function(){
   const saved=localStorage.getItem('agroSenseTheme');
   applyTheme(saved==='light' ? 'light' : 'dark');
@@ -1348,6 +1514,7 @@ window.loadTheme=function(){
 
 window.loadStaffFromStorage();
 window.loadTheme();
+window.loadPhotoPreview();
 
 /* ── LOADER ── */
 (function(){
@@ -1408,7 +1575,13 @@ function activatePanel(tab){
     panels[tab].style.display='block';
     panels[tab].classList.remove('panel'); void panels[tab].offsetWidth; panels[tab].classList.add('panel');
   }
-  if(tab==='analytics'){setTimeout(initBarChart,100);}
+  if(tab==='analytics'){
+    setTimeout(()=>{
+      initBarChart();
+      updateAnalyticsMetrics();
+      updateAnalyticsChart();
+    },100);
+  }
   if(tab==='history'){renderHistory();}
   if(tab==='staff'){renderStaff();}
   if(tab==='billing'){renderBilling();}
@@ -1424,6 +1597,52 @@ document.querySelectorAll('.nav-item').forEach(item=>{
 /* ── METRICS UPDATE ── */
 function setEl(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 function setBar(id,pct){const e=document.getElementById(id);if(e)e.style.width=Math.max(0,Math.min(100,pct))+'%';}
+
+function updateSensorPanel(){
+  const now = Date.now();
+  const recent = lastRealtimeUpdate && (now - lastRealtimeUpdate) < 15000;
+  const connected = isRealtimeConnected || recent;
+  const summary = document.getElementById('sensor-panel-status');
+  if(summary){
+    summary.textContent = connected
+      ? 'Semua sensor terhubung. Data dikirim secara real-time dari node IoT setiap beberapa detik.'
+      : 'Sensor belum menerima data terkini. Periksa koneksi perangkat atau server.';
+  }
+
+  const sensors = [
+    { id:'ph', value:S.ph, unit:'', defaultMeta:'Koneksi tidak tersedia.', goodMeta:'Koneksi stabil setiap 4 detik.', warningMeta:'Nilai pH berada di luar target.' },
+    { id:'ppm', value:S.ppm, unit:'', defaultMeta:'Data nutrisi tidak tersedia.', goodMeta:'Nilai nutrisi berada dalam target.', warningMeta:'Nilai nutrisi di luar target.' },
+    { id:'temp', value:S.temp, unit:'°C', defaultMeta:'Data suhu tidak tersedia.', goodMeta:'Suhu air normal dan stabil.', warningMeta:'Periksa suhu sensor.' },
+    { id:'hum', value:S.hum, unit:'%', defaultMeta:'Data kelembapan tidak tersedia.', goodMeta:'Kelembapan ideal.', warningMeta:'Kelembapan di luar target.' },
+  ];
+
+  sensors.forEach(sensor => {
+    const valueEl = document.getElementById(`sensor-${sensor.id}-value`);
+    const metaEl = document.getElementById(`sensor-${sensor.id}-meta`);
+    const statusEl = document.getElementById(`sensor-${sensor.id}-status`);
+    const hasValue = typeof sensor.value === 'number' && !Number.isNaN(sensor.value);
+    const ok = connected && hasValue;
+    const statusText = ok ? 'Online' : 'Offline';
+    const pillClass = ok ? 'pill-ok' : 'pill-danger';
+    let metaText = sensor.defaultMeta;
+
+    if(ok){
+      const outOfRange =
+        (sensor.id === 'ph' && (sensor.value < S.thresholds.minPH || sensor.value > S.thresholds.maxPH)) ||
+        (sensor.id === 'ppm' && (sensor.value < S.thresholds.minPPM || sensor.value > S.thresholds.maxPPM)) ||
+        (sensor.id === 'temp' && (sensor.value < S.thresholds.minTemp || sensor.value > S.thresholds.maxTemp)) ||
+        (sensor.id === 'hum' && (sensor.value < S.thresholds.minHum || sensor.value > S.thresholds.maxHum));
+      metaText = outOfRange ? sensor.warningMeta : sensor.goodMeta;
+    }
+
+    if(valueEl) valueEl.textContent = hasValue ? `${sensor.value}${sensor.unit}` : '—';
+    if(metaEl) metaEl.textContent = metaText;
+    if(statusEl){
+      statusEl.textContent = statusText;
+      statusEl.className = `card-pill ${pillClass}`;
+    }
+  });
+}
 
 function updateMetrics(){
   setEl('mc-ph', S.ph.toFixed(1));
@@ -1458,6 +1677,7 @@ function updateMetrics(){
     humFoot.textContent=humOk?'Kelembapan ideal':S.hum<S.thresholds.minHum?'Kelembapan rendah':'Kelembapan tinggi';
     humFoot.className='mcard-foot '+(humOk?'mc-accent':'mc-warn');
   }
+  updateSensorPanel();
 }
 
 /* ── SIMULATION ── */
@@ -1495,8 +1715,8 @@ function initCharts(){
       data:{
         labels:hrs,
         datasets:[
-          {label:'pH',data:hrs.map(()=>+(6.1+Math.random()*.5).toFixed(2)),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.08)',tension:.5,fill:true,pointRadius:2,pointHoverRadius:5},
-          {label:'PPM/100',data:hrs.map(()=>+((1150+Math.random()*200)/100).toFixed(1)),borderColor:'#06b6d4',backgroundColor:'rgba(6,182,212,0.06)',tension:.5,fill:true,pointRadius:2,pointHoverRadius:5},
+          {label:'pH Level',data:hrs.map(()=>+(6.1+Math.random()*.5).toFixed(2)),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.08)',tension:.5,fill:true,pointRadius:2,pointHoverRadius:5},
+          {label:'Nutrients',data:hrs.map(()=>+((1150+Math.random()*200)/100).toFixed(1)),borderColor:'#06b6d4',backgroundColor:'rgba(6,182,212,0.06)',tension:.5,fill:true,pointRadius:2,pointHoverRadius:5},
           {label:'Temperature',data:hrs.map(()=>+(23+Math.random()*6).toFixed(1)),borderColor:'#f97316',backgroundColor:'rgba(249,115,22,0.08)',tension:.5,fill:true,pointRadius:2,pointHoverRadius:5},
           {label:'Humidity',data:hrs.map(()=>+(55+Math.random()*20).toFixed(0)),borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.08)',tension:.5,fill:true,pointRadius:2,pointHoverRadius:5},
         ]
@@ -1534,13 +1754,14 @@ function pushFlowChart(){
   S.charts.flow.update('none');
 }
 
+const BAR_COLORS=['#22c55e','#06b6d4','#f97316','#60a5fa'];
+
 function initBarChart(){
   if(S.charts.bar)return;
   const ctx=document.getElementById('chart-bar');
   if(!ctx)return;
   const recent=S.history.slice(0,24).map(r=>r.ppm).reverse();
   const lbls=S.history.slice(0,24).map(r=>r.timestamp.slice(-8,-3)).reverse();
-  const BAR_COLORS=['#22c55e','#06b6d4','#f97316','#60a5fa'];
   const barColors=(recent.length?recent:Array.from({length:12},()=>1150+Math.floor(Math.random()*250))).map((_,i)=>BAR_COLORS[i%BAR_COLORS.length]);
   S.charts.bar=new Chart(ctx.getContext('2d'),{
     type:'bar',
@@ -1566,13 +1787,47 @@ function loadHistory(){
     });
     saveHistory();
   }
+  updateAnalyticsMetrics();
+  updateAnalyticsChart();
 }
 function saveHistory(){try{localStorage.setItem('rfv-hist2',JSON.stringify(S.history));}catch(_){}}
 function addHistory(){
   S.history.unshift({timestamp:new Date().toLocaleString('id-ID'),ph:S.ph.toFixed(2),ppm:Math.round(S.ppm),temp:S.temp.toFixed(1),hum:Math.round(S.hum),status:(S.ph>=S.thresholds.minPH&&S.ph<=S.thresholds.maxPH)?'Normal':'Alert'});
   if(S.history.length>100)S.history.pop();
   saveHistory();
+  updateAnalyticsMetrics();
+  updateAnalyticsChart();
 }
+function getHistoryMetrics(){
+  const recent=S.history.slice(0,24);
+  const count=recent.length;
+  if(!count) return {avgPh:0,avgPpm:0,normalEvents:0,alertEvents:0};
+  const avgPh=recent.reduce((sum,r)=>sum+parseFloat(r.ph),0)/count;
+  const avgPpm=recent.reduce((sum,r)=>sum+parseFloat(r.ppm),0)/count;
+  const normalEvents=recent.filter(r=>r.status==='Normal').length;
+  const alertEvents=count-normalEvents;
+  return {avgPh,avgPpm,normalEvents,alertEvents};
+}
+
+function updateAnalyticsMetrics(){
+  const {avgPh,avgPpm,normalEvents,alertEvents}=getHistoryMetrics();
+  setEl('avg-ph', avgPh.toFixed(1));
+  setEl('avg-ppm', Math.round(avgPpm));
+  setEl('evt-norm', normalEvents);
+  setEl('evt-alrt', alertEvents);
+}
+
+function updateAnalyticsChart(){
+  if(!S.charts.bar) return;
+  const recent=S.history.slice(0,24).map(r=>r.ppm).reverse();
+  const lbls=S.history.slice(0,24).map(r=>r.timestamp.slice(-8,-3)).reverse();
+  const barColors=recent.map((_,i)=>BAR_COLORS[i%BAR_COLORS.length]);
+  S.charts.bar.data.labels=lbls;
+  S.charts.bar.data.datasets[0].data=recent;
+  S.charts.bar.data.datasets[0].backgroundColor=barColors;
+  S.charts.bar.update('none');
+}
+
 function renderHistory(){
   const tb=document.getElementById('hist-body');if(!tb)return;
   tb.innerHTML=S.history.slice(0,25).map(r=>{
@@ -1586,8 +1841,9 @@ function renderHistory(){
       <td style="padding:10px 12px"><span class="status-pill ${ok?'sp-green':'sp-red'}">${r.status}</span></td>
     </tr>`;
   }).join('');
+  updateAnalyticsMetrics();
 }
-window.clearHistory=function(){if(!confirm('Hapus semua riwayat?'))return;S.history=[];saveHistory();renderHistory();showToast('Riwayat dibersihkan','info');};
+window.clearHistory=function(){if(!confirm('Hapus semua riwayat?'))return;S.history=[];saveHistory();renderHistory();updateAnalyticsMetrics();updateAnalyticsChart();showToast('Riwayat dibersihkan','info');};
 window.exportCSV=function(){
   const h=['Timestamp','pH','PPM','Temp','Humidity','Status'];
   const rows=S.history.map(r=>[r.timestamp,r.ph,r.ppm,r.temp,r.hum,r.status]);
@@ -1826,6 +2082,8 @@ window.addEventListener('DOMContentLoaded',()=>{
     .then((data) => {
       if (data && data.temp !== undefined && data.humidity !== undefined) {
         updateSensorData(data);
+        lastRealtimeUpdate = Date.now();
+        updateSensorPanel();
       }
     })
     .catch(() => {

@@ -7,8 +7,10 @@ const socketIO = require('socket.io');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
+const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const multer = require('multer');
 const mqtt = require('mqtt');
 
 // Load environment variables
@@ -31,6 +33,46 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+const uploadDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: uploadDir,
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+    cb(null, `garden-photo-${Date.now()}${ext}`);
+  }
+});
+
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  }
+});
+
+let latestPhotoFile = null;
+function getLatestPhotoFile() {
+  if (latestPhotoFile) {
+    const storedPath = path.join(uploadDir, latestPhotoFile);
+    if (fs.existsSync(storedPath)) return latestPhotoFile;
+  }
+  const files = fs.readdirSync(uploadDir).filter((file) => /\.(jpe?g|png|gif|webp)$/i.test(file));
+  if (!files.length) return null;
+  files.sort((a, b) => fs.statSync(path.join(uploadDir, b)).mtimeMs - fs.statSync(path.join(uploadDir, a)).mtimeMs);
+  latestPhotoFile = files[0];
+  return latestPhotoFile;
+}
 
 // Store sensor data in memory (can be replaced with database)
 let latestSensorData = {
@@ -376,8 +418,52 @@ app.get('/api/sensor/latest', (req, res) => {
   res.json(latestSensorData);
 });
 
-// ===== Socket.IO EVENTS =====
+app.get('/api/photo', (req, res) => {
+  const photoFile = getLatestPhotoFile();
+  if (!photoFile) {
+    return res.status(404).json({ success: false, message: 'No photo available' });
+  }
+  res.json({ success: true, url: `/uploads/${encodeURIComponent(photoFile)}` });
+});
 
+app.post('/api/photo', upload.single('photo'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: 'Foto tidak ditemukan' });
+  }
+
+  const previousPhoto = getLatestPhotoFile();
+  if (previousPhoto) {
+    const previousPath = path.join(uploadDir, previousPhoto);
+    if (fs.existsSync(previousPath)) {
+      try {
+        fs.unlinkSync(previousPath);
+      } catch (err) {
+        console.warn('Could not delete previous photo:', err.message);
+      }
+    }
+  }
+
+  latestPhotoFile = req.file.filename;
+  res.json({ success: true, message: 'Foto berhasil diunggah', url: `/uploads/${encodeURIComponent(req.file.filename)}` });
+});
+
+app.delete('/api/photo', (req, res) => {
+  const photoFile = getLatestPhotoFile();
+  if (!photoFile) {
+    return res.status(404).json({ success: false, message: 'Tidak ada foto untuk dihapus' });
+  }
+
+  const filePath = path.join(uploadDir, photoFile);
+  try {
+    fs.unlinkSync(filePath);
+    latestPhotoFile = null;
+    res.json({ success: true, message: 'Foto berhasil dihapus' });
+  } catch (err) {
+    console.error('Failed to delete photo:', err.message);
+    res.status(500).json({ success: false, message: 'Gagal menghapus foto', error: err.message });
+  }
+});
+// ===== Socket.IO EVENTS =====
 io.on('connection', (socket) => {
   console.log(`[Socket.io] Device connected: ${socket.id}`);
 
