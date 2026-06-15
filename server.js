@@ -12,6 +12,7 @@ const path = require('path');
 const https = require('https');
 const multer = require('multer');
 const mqtt = require('mqtt');
+const crypto = require('crypto');
 
 // Load environment variables
 dotenv.config();
@@ -60,6 +61,41 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024
   }
 });
+
+const sessions = {};
+const users = {
+  'admin@example.com': {
+    email: 'admin@example.com',
+    password: 'admin123',
+    role: 'admin',
+    name: 'Admin RSV'
+  },
+  'user@example.com': {
+    email: 'user@example.com',
+    password: 'user123',
+    role: 'user',
+    name: 'Pengguna RSV'
+  }
+};
+
+function parseCookies(req) {
+  const header = req.headers.cookie || '';
+  return header.split(';').reduce((acc, cookie) => {
+    const [key, value] = cookie.split('=').map((part) => part && part.trim());
+    if (key && value) acc[key] = decodeURIComponent(value);
+    return acc;
+  }, {});
+}
+
+function getSession(req) {
+  const cookies = parseCookies(req);
+  return cookies.sessionId ? sessions[cookies.sessionId] : null;
+}
+
+function requireAuth(req, res, next) {
+  if (getSession(req)) return next();
+  return res.redirect('/login');
+}
 
 let latestPhotoFile = null;
 function getLatestPhotoFile() {
@@ -307,14 +343,82 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Login page
+app.get('/login', (req, res) => {
+  const session = getSession(req);
+  if (session) {
+    return res.redirect('/dashboard');
+  }
+  res.sendFile(path.join(__dirname, 'admin', 'login.html'));
+});
+
+// Login API
+app.post('/login', (req, res) => {
+  const { email, password } = req.body || {};
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  const user = users[normalizedEmail];
+
+  if (!user || user.password !== String(password || '')) {
+    return res.status(401).json({ success: false, message: 'Email atau kata sandi salah.' });
+  }
+
+  const sessionId = crypto.randomBytes(18).toString('hex');
+  sessions[sessionId] = {
+    email: user.email,
+    role: user.role,
+    name: user.name,
+    createdAt: Date.now()
+  };
+
+  res.setHeader('Set-Cookie', [
+    `sessionId=${sessionId}; HttpOnly; Path=/; SameSite=Lax`,
+    `userRole=${user.role}; Path=/; SameSite=Lax`
+  ]);
+  return res.json({ success: true, redirect: '/dashboard' });
+});
+
+// Signup API
+app.post('/signup', (req, res) => {
+  const { name, email, password } = req.body || {};
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  const displayName = String(name || '').trim() || 'Pengguna RSV';
+
+  if (!normalizedEmail || !password || password.length < 8) {
+    return res.status(400).json({ success: false, message: 'Lengkapi nama, email, dan kata sandi minimal 8 karakter.' });
+  }
+
+  if (users[normalizedEmail]) {
+    return res.status(409).json({ success: false, message: 'Email sudah terdaftar. Silakan masuk.' });
+  }
+
+  const newUser = {
+    email: normalizedEmail,
+    password: String(password),
+    role: 'user',
+    name: displayName
+  };
+
+  users[normalizedEmail] = newUser;
+
+  return res.status(201).json({ success: true, message: 'Akun berhasil dibuat. Silakan masuk untuk melanjutkan.' });
+});
+
 // Dashboard
-app.get('/dashboard', (req, res) => {
+app.get('/dashboard', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
 });
 
-// Simple logout endpoint (no auth implemented yet)
+// Logout
 app.get('/logout', (req, res) => {
-  res.redirect('/');
+  const cookies = parseCookies(req);
+  if (cookies.sessionId && sessions[cookies.sessionId]) {
+    delete sessions[cookies.sessionId];
+  }
+  res.setHeader('Set-Cookie', [
+    'sessionId=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax',
+    'userRole=; Path=/; Max-Age=0; SameSite=Lax'
+  ]);
+  res.redirect('/login');
 });
 
 // ===== API ENDPOINTS =====

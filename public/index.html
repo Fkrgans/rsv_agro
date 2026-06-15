@@ -571,44 +571,67 @@
     /* ─── FEATURES ──────────────────────────────────── */
     .feat-section { background: var(--bg); }
 
-    .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; margin-top: 4rem; }
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 4rem;
+    }
 
     .feat-item {
-      padding: 2.25rem;
+      position: relative;
+      padding: 1.75rem;
       background: var(--surface);
-      position: relative; overflow: hidden;
-      transition: background 0.3s ease;
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
       cursor: default;
     }
-    .feat-item::after {
+    .feat-item::before {
       content: '';
-      position: absolute; inset: 0; opacity: 0;
-      background: radial-gradient(ellipse 80% 80% at var(--mx, 50%) var(--my, 50%), rgba(0,229,160,0.05) 0%, transparent 70%);
-      transition: opacity 0.4s ease;
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(0,229,160,0.08) 1px, transparent 10px);
+      background-size: 24px 24px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
       pointer-events: none;
     }
-    .feat-item:hover::after { opacity: 1; }
-    .feat-item:hover { background: rgba(11,17,32,0.8); }
+    .feat-item:hover::before { opacity: 1; }
+    .feat-item:hover { transform: translateY(-3px); box-shadow: 0 24px 50px rgba(0,0,0,0.08); border-color: rgba(0,229,160,0.18); }
 
-    .feat-icon {
-      width: 52px; height: 52px; border-radius: 14px;
-      background: rgba(0,181,127,0.08); border: 1px solid rgba(0,181,127,0.15);
+    .feat-item .feat-icon-box {
+      width: 52px; height: 52px;
+      border-radius: 16px;
       display: flex; align-items: center; justify-content: center;
-      margin-bottom: 1.25rem;
+      background: rgba(0,229,160,0.1);
+      border: 1px solid rgba(0,229,160,0.18);
+      color: var(--accent2);
       transition: transform 0.3s ease, background 0.3s ease;
     }
-    .feat-item:hover .feat-icon { transform: scale(1.1) rotate(-4deg); background: rgba(0,181,127,0.15); }
-    .feat-icon svg { width: 24px; height: 24px; color: var(--accent); }
+    .feat-item:hover .feat-icon-box { transform: scale(1.05); }
+    .feat-item .feat-icon-box svg { width: 24px; height: 24px; color: var(--accent2); }
 
-    .feat-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 0.6rem; }
-    .feat-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.75; }
-    .feat-tag {
-      display: inline-block; margin-top: 1rem;
+    .feat-status {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.63rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
-      padding: 3px 9px; border-radius: 100px;
-      border: 1px solid rgba(0,181,127,0.2); color: var(--accent2); background: rgba(0,181,127,0.06);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 0.35rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.05);
     }
+    [data-theme="dark"] .feat-status { background: rgba(255,255,255,0.08); }
+
+    .feat-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 0.85rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+    .feat-version {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .feat-desc { font-size: 0.95rem; color: var(--muted); line-height: 1.75; }
 
     /* ─── PRODUCTS ──────────────────────────────────── */
     .prod-section { background: var(--surface); }
@@ -857,12 +880,43 @@
 
     @media (max-width: 1024px) {
       .price-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dash-grid { grid-template-columns: 1fr; }
+      .dash-card { min-height: auto; }
+      .control-row { flex-wrap: wrap; gap: 12px; padding: 1rem 1rem; }
+      .control-meta { width: 100%; }
+      .toggle { margin-left: 0; align-self: flex-start; }
+      .hero { padding: 8rem 1.5rem 3rem; }
+      .hero-split { gap: 2rem; }
+      #hero-mockup { max-width: 100%; padding: 0 0.75rem; }
+      #mockup-panel { transform: none !important; max-width: 100%; }
+      .mockup-grid { grid-template-columns: 1fr; }
+      .section-pad { padding: 5rem 1.5rem; }
+      .container { padding-left: 1rem; padding-right: 1rem; }
     }
     @media (max-width: 768px) {
-      .price-grid { grid-template-columns: 1fr; }
+      .hero-h1 { font-size: clamp(2.2rem, 9vw, 3.3rem); }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .feat-grid { grid-template-columns: 1fr; }
+      .prod-grid, .hiw-grid, .price-grid, .testi-grid, .dash-grid { grid-template-columns: 1fr; }
       .price-card { min-height: auto; }
       .price-card.featured { transform: none; }
       .price-card:hover { transform: translateY(-8px) scale(1.01); }
+      .dash-card { min-height: auto; }
+      .control-row { flex-wrap: wrap; gap: 12px; }
+      .control-meta { width: min(100%, 70%); }
+      .toggle { margin-left: auto; }
+      .loc-grid { grid-template-columns: 1fr; }
+      .map-wrap { min-height: 320px; aspect-ratio: auto; }
+      .screen-body { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .db-chart-area { grid-column: span 2; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      #hero-mockup { max-width: 100%; padding: 0 0.75rem; }
+      #mockup-panel { transform: none !important; max-width: 100%; }
+      .mockup-grid { grid-template-columns: 1fr; }
+      .hero { padding: 6rem 1rem 3rem; }
+      .section-pad { padding: 4rem 1rem; }
     }
     .price-divider.light { background: rgba(0,229,160,0.15); }
 
@@ -898,47 +952,58 @@
     .price-btn-outline:hover { background: var(--btn-ghost-hover); transform: translateY(-1px); }
 
     /* ─── TESTIMONIALS ──────────────────────────────── */
-    .testi-section { background: var(--surface); }
-
-    .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 4rem; }
-
-    .testi-card {
-      background: var(--bg); border: 1px solid var(--border); border-radius: 18px;
+    .testi-section {
+      background: linear-gradient(180deg, rgba(0,229,160,0.12) 0%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0.06) 100%);
+      padding: 6rem 0 8rem;
       overflow: hidden;
-      transition: transform 0.3s ease, border-color 0.3s ease;
     }
-    .testi-card:hover { transform: translateY(-6px); border-color: rgba(0,229,160,0.2); }
+    .testi-section > .container {
+      max-width: 100%;
+      width: 100%;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .section-divider {
+      width: 100%; height: 1px; margin: 2rem auto 3rem;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+    }
+    .testi-grid { display: grid; grid-template-columns: 1fr; margin-top: 4rem; }
 
-    .testi-top { padding: 1.75rem 1.75rem 1.25rem; position: relative; }
-    .testi-qmark {
-      position: absolute; top: 1rem; right: 1.5rem;
-      font-family: Georgia, serif; font-size: 5rem; line-height: 1;
-      color: rgba(0,229,160,0.06); font-weight: 900; user-select: none;
+    .testimonial-component {
+      width: calc(100vw - 4rem);
+      max-width: none;
+      background: rgba(255,255,255,0.08);
+      border-color: var(--border);
+      backdrop-filter: blur(24px);
+      margin-left: calc(50% - 50vw);
+      margin-right: calc(50% - 50vw);
+      padding: 4rem 2rem;
+      border-radius: 42px;
     }
-    .stars { display: flex; gap: 3px; margin-bottom: 1rem; }
-    .star { width: 14px; height: 14px; fill: #fbbf24; color: #fbbf24; }
-    .testi-quote { font-size: 0.875rem; color: var(--muted); line-height: 1.8; font-style: italic; }
+    .testimonial-component .grid { gap: 2rem; }
+    .testimonial-component .relative.min-h-[380px] { min-height: 360px; }
+    .testimonial-slide { transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(255,255,255,0.06); border-color: var(--border); color: var(--text); backdrop-filter: blur(12px); }
+    .testi-dot-active { width: 2.5rem; background: var(--accent); }
+    .testi-dot-inactive { width: 0.625rem; background: rgba(255,255,255,0.25); opacity: 0.65; }
 
-    .testi-bottom {
-      padding: 1rem 1.75rem;
-      border-top: 1px solid var(--border);
-      display: flex; align-items: center; gap: 12px;
-      background: rgba(255,255,255,0.01);
+    @media (max-width: 1200px) {
+      .testimonial-component { width: calc(100vw - 3rem); padding: 3.5rem 1.75rem; }
     }
-    .testi-avatar {
-      width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Syne', sans-serif; font-weight: 800; color: #05080f; font-size: 0.8rem;
-      background: linear-gradient(135deg, #00b57f, #00e5a0);
+    @media (max-width: 1024px) {
+      .testi-section > .container { padding-left: 1rem; padding-right: 1rem; }
+      .testimonial-component { width: calc(100vw - 2rem); padding: 3rem 1.5rem; }
+      .testimonial-component .grid { grid-template-columns: 1fr; }
+      .testimonial-component .relative.min-h-[380px] { min-height: 300px; }
     }
-    .testi-name { font-weight: 600; font-size: 0.875rem; color: var(--text); }
-    .testi-role { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
-    .verified-badge {
-      margin-left: auto; font-family: 'JetBrains Mono', monospace;
-      font-size: 0.6rem; color: var(--accent); letter-spacing: 0.04em;
-      display: flex; align-items: center; gap: 4px;
+    @media (max-width: 640px) {
+      .testi-section { padding: 4rem 0 6rem; }
+      .testimonial-component { width: auto; margin-left: 1rem; margin-right: 1rem; padding: 2rem 1rem; border-radius: 28px; }
+      .testimonial-component .grid { gap: 1.5rem; }
+      .testimonial-component .relative.min-h-[380px] { min-height: 260px; }
+      .testimonial-component .space-y-6 { gap: 1rem; }
+      .testimonial-component .text-3xl { font-size: 2rem; }
+      .testimonial-component .text-sm { font-size: 0.95rem; }
     }
-    .verified-badge svg { width: 12px; height: 12px; }
 
     .proof-strip {
       display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 3rem;
@@ -1153,6 +1218,23 @@
       #hero-mockup { max-width: 100%; padding: 0 0.75rem; }
       #mockup-panel { transform: none !important; max-width: 100%; }
       .mockup-grid { grid-template-columns: 1fr; }
+      .hero { padding: 6rem 1rem 3rem; }
+      .hero-split { gap: 1.5rem; }
+      .hero-left { width: 100%; }
+      .hero-actions { flex-direction: column; align-items: stretch; }
+      .hero-actions .btn-primary,
+      .hero-actions .btn-ghost {
+        width: 100%; justify-content: center;
+      }
+      .hero-trust { justify-content: center; gap: 12px; }
+      .dash-card { padding: 1.5rem; }
+      .control-row { padding: 1rem; gap: 12px; }
+      .control-meta { width: 100%; }
+      .toggle { margin-left: 0; width: 4rem; }
+      .testi-section { padding: 4rem 0 5rem; }
+      .testimonial-component { padding: 2rem 1rem; border-radius: 24px; }
+      .section-pad { padding: 4rem 1rem; }
+      .container { padding-left: 1rem; padding-right: 1rem; }
     }
   </style>
 </head>
@@ -1207,7 +1289,7 @@
     <a href="#dashboard"    class="mob-link" onclick="closeMob()">Dashboard</a>
     <a href="#pricing"      class="mob-link" onclick="closeMob()">Pricing</a>
     <a href="#location"     class="mob-link" onclick="closeMob()">Lokasi</a>
-    <button onclick="openModal();closeMob();" class="btn-primary" style="margin-top:1rem;justify-content:center;">Mulai Sekarang →</button>
+    <button onclick="window.location.href='/login'" class="btn-primary" style="margin-top:1rem;justify-content:center;">Mulai Sekarang →</button>
   </div>
 </nav>
 
@@ -1229,7 +1311,7 @@
         </h1>
         <p class="hero-sub">RFV Hydro-sense menggabungkan sensor presisi dan otomasi cerdas untuk memaksimalkan hasil panen Anda. Monitor pH, PPM, dan iklim secara real-time — dari mana saja.</p>
         <div class="hero-actions">
-          <button onclick="openModal()" class="btn-primary">Mulai Monitoring</button>
+          <button onclick="window.location.href='/login'" class="btn-primary">Mulai Monitoring</button>
           <button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})" class="btn-ghost">Lihat Produk →</button>
         </div>
         <div class="hero-trust">
@@ -1389,58 +1471,82 @@
     </div>
     <div class="feat-grid" id="feat-grid">
 
-      <div class="feat-item">
-        <div class="feat-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      <div class="feat-item group">
+        <div class="flex items-center justify-between mb-5">
+          <div class="feat-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <span class="feat-status">Active</span>
         </div>
-        <h3 class="feat-title">Real-time Telemetry</h3>
-        <p class="feat-desc">Streaming data instan via WebSocket — tidak pernah melewatkan perubahan kritis pada tanaman Anda.</p>
-        <span class="feat-tag">WebSocket · MQTT</span>
+        <div class="space-y-3">
+          <h3 class="feat-title">Real-time Telemetry <span class="feat-version">v2.4.1</span></h3>
+          <p class="feat-desc">Real-time metrics dengan AI-powered insights dan predictive analytics untuk tanaman Anda.</p>
+        </div>
       </div>
 
-      <div class="feat-item">
-        <div class="feat-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="3"/><circle cx="12" cy="14" r="3"/><line x1="9" y1="6" x2="9.01" y2="6"/><line x1="12" y1="6" x2="12.01" y2="6"/><line x1="15" y1="6" x2="15.01" y2="6"/></svg>
+      <div class="feat-item group">
+        <div class="flex items-center justify-between mb-5">
+          <div class="feat-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="3"/><circle cx="12" cy="14" r="3"/><line x1="9" y1="6" x2="9.01" y2="6"/><line x1="12" y1="6" x2="12.01" y2="6"/><line x1="15" y1="6" x2="15.01" y2="6"/></svg>
+          </div>
+          <span class="feat-status">Live</span>
         </div>
-        <h3 class="feat-title">Remote Controls</h3>
-        <p class="feat-desc">Kendalikan pompa, dosing, dan pencahayaan langsung dari dashboard kapanpun, dari mana pun.</p>
-        <span class="feat-tag">8-Relay · WiFi</span>
+        <div class="space-y-3">
+          <h3 class="feat-title">Remote Controls <span class="feat-version">v1.8.3</span></h3>
+          <p class="feat-desc">Kendalikan pompa, dosing, dan pencahayaan langsung dari dashboard kapan saja, dari mana saja.</p>
+        </div>
       </div>
 
-      <div class="feat-item">
-        <div class="feat-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><polyline points="2 20 22 20"/></svg>
+      <div class="feat-item group">
+        <div class="flex items-center justify-between mb-5">
+          <div class="feat-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><polyline points="2 20 22 20"/></svg>
+          </div>
+          <span class="feat-status">Stable</span>
         </div>
-        <h3 class="feat-title">Growth Analytics</h3>
-        <p class="feat-desc">Grafik interaktif memvisualkan tren pertumbuhan dan membantu optimasi hasil panen setiap siklus.</p>
-        <span class="feat-tag">Chart.js · Insight</span>
+        <div class="space-y-3">
+          <h3 class="feat-title">Growth Analytics <span class="feat-version">v3.0.0</span></h3>
+          <p class="feat-desc">Grafik tren pertumbuhan interaktif yang membantu optimasi hasil panen setiap siklus.</p>
+        </div>
       </div>
 
-      <div class="feat-item">
-        <div class="feat-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="feat-item group">
+        <div class="flex items-center justify-between mb-5">
+          <div class="feat-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <span class="feat-status">Alert</span>
         </div>
-        <h3 class="feat-title">Smart Alerts</h3>
-        <p class="feat-desc">Notifikasi via WhatsApp dan email saat pH atau nutrisi keluar dari batas optimal yang Anda tentukan.</p>
-        <span class="feat-tag">WhatsApp · Email</span>
+        <div class="space-y-3">
+          <h3 class="feat-title">Smart Alerts <span class="feat-version">v1.5.7</span></h3>
+          <p class="feat-desc">Notifikasi WhatsApp dan email saat pH atau nutrisi keluar dari batas optimal.</p>
+        </div>
       </div>
 
-      <div class="feat-item">
-        <div class="feat-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <div class="feat-item group">
+        <div class="flex items-center justify-between mb-5">
+          <div class="feat-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <span class="feat-status">AI</span>
         </div>
-        <h3 class="feat-title">AI Recommendations</h3>
-        <p class="feat-desc">Engine AI menganalisis pola historis dan merekomendasikan jadwal nutrisi optimal tiap fase pertumbuhan.</p>
-        <span class="feat-tag">ML Engine · Auto</span>
+        <div class="space-y-3">
+          <h3 class="feat-title">AI Recommendations <span class="feat-version">v4.2.0</span></h3>
+          <p class="feat-desc">AI menganalisis pola historis untuk rekomendasi jadwal nutrisi setiap fase pertumbuhan.</p>
+        </div>
       </div>
 
-      <div class="feat-item">
-        <div class="feat-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+      <div class="feat-item group">
+        <div class="flex items-center justify-between mb-5">
+          <div class="feat-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          </div>
+          <span class="feat-status">Secure</span>
         </div>
-        <h3 class="feat-title">Secure & Reliable</h3>
-        <p class="feat-desc">Enkripsi end-to-end dan uptime 99.9% memastikan data dan kontrol sistem selalu aman dan tersedia.</p>
-        <span class="feat-tag">TLS · 99.9% Uptime</span>
+        <div class="space-y-3">
+          <h3 class="feat-title">Secure & Reliable <span class="feat-version">v2.1.0</span></h3>
+          <p class="feat-desc">Enkripsi end-to-end dan uptime 99.9% untuk data dan kontrol sistem yang aman.</p>
+        </div>
       </div>
 
     </div>
@@ -1643,7 +1749,7 @@
     </div>
   </div>
 </section>
-
+<div class="section-divider"></div>
 <!-- ── TESTIMONIALS ────────────────────────────────── -->
 <section class="testi-section section-pad">
   <div class="container">
@@ -1653,103 +1759,24 @@
       <p class="section-sub" style="margin:0 auto;">Dengarkan langsung dari para grower yang telah mengubah cara bertani mereka.</p>
     </div>
     <div class="testi-grid" id="testi-grid">
+      <div class="testimonial-component w-full max-w-full mx-auto px-6 py-20 border border-[var(--border)] rounded-[32px] backdrop-blur-2xl shadow-2xl overflow-hidden">
+        <div class="grid gap-12 md:grid-cols-[1.1fr_0.9fr] items-center">
+          <div class="space-y-6">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,229,160,0.08)] text-sm text-[var(--accent)] border border-[rgba(0,229,160,0.16)]">
+              <svg class="h-4 w-4 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 5l1.5 4.5h4.5l-3.75 2.75 1.5 4.5L12 14l-3.75 2.75 1.5-4.5L6 9.5h4.5L12 5z"/></svg>
+              <span>Trusted by growers</span>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-extrabold leading-tight text-[var(--text)]">Loved by growers and hydroponic farmers</h2>
+            <p class="max-w-xl text-sm md:text-base leading-relaxed text-[var(--muted)]">Dengar langsung dari pengguna yang mengandalkan sistem IoT RFV Hydro-sense untuk monitoring otomatis, rekomendasi nutrisi, dan panen yang lebih konsisten.</p>
+            <div id="testi-dots" class="flex flex-wrap items-center gap-3"></div>
+          </div>
 
-      <div class="testi-card">
-        <div class="testi-top">
-          <div class="testi-qmark">"</div>
-          <div class="stars">
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <p class="testi-quote">"RFV Hydro-sense benar-benar mengubah cara saya mengelola kebun. Dulu cek pH manual 3x sehari, sekarang semua otomatis!"</p>
-        </div>
-        <div class="testi-bottom">
-          <div class="testi-avatar">BS</div>
-          <div>
-            <p class="testi-name">Budi Santoso</p>
-            <p class="testi-role">Grower · Yogyakarta</p>
-          </div>
-          <div class="verified-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            Verified
+          <div class="relative min-h-[380px] flex items-center justify-center">
+            <div class="absolute -left-8 -bottom-8 w-32 h-32 rounded-3xl bg-[rgba(0,229,160,0.12)] blur-2xl"></div>
+            <div class="absolute -right-8 -top-8 w-28 h-28 rounded-3xl bg-[rgba(0,157,111,0.12)] blur-2xl"></div>
+            <div id="testi-cards" class="relative w-full min-h-[380px]"></div>
           </div>
         </div>
-      </div>
-
-      <div class="testi-card">
-        <div class="testi-top">
-          <div class="testi-qmark">"</div>
-          <div class="stars">
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <p class="testi-quote">"Dashboard-nya sangat intuitif. Bisa monitoring dari HP saat di luar kota. Panen meningkat 35% sejak pakai RFV!"</p>
-        </div>
-        <div class="testi-bottom">
-          <div class="testi-avatar">DP</div>
-          <div>
-            <p class="testi-name">Dewi Pratiwi</p>
-            <p class="testi-role">Urban Farmer · Jakarta</p>
-          </div>
-          <div class="verified-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            Verified
-          </div>
-        </div>
-      </div>
-
-      <div class="testi-card">
-        <div class="testi-top">
-          <div class="testi-qmark">"</div>
-          <div class="stars">
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg class="star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <p class="testi-quote">"Fitur AI recommendations-nya luar biasa. Sistem secara otomatis menyesuaikan nutrisi berdasarkan fase pertumbuhan."</p>
-        </div>
-        <div class="testi-bottom">
-          <div class="testi-avatar">RH</div>
-          <div>
-            <p class="testi-name">Mamank Garonk</p>
-            <p class="testi-role">Commercial Farm · Bandung</p>
-          </div>
-          <div class="verified-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            Verified
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="proof-strip">
-      <div class="proof-item">
-        <div class="proof-num">2,500+</div>
-        <div class="proof-lbl">Active Growers</div>
-      </div>
-      <div style="width:1px;height:48px;background:var(--border);"></div>
-      <div class="proof-item">
-        <div class="proof-num">4.9/5</div>
-        <div class="proof-lbl">Rata-rata Rating</div>
-      </div>
-      <div style="width:1px;height:48px;background:var(--border);"></div>
-      <div class="proof-item">
-        <div class="proof-num">35%</div>
-        <div class="proof-lbl">Peningkatan Panen</div>
-      </div>
-      <div style="width:1px;height:48px;background:var(--border);"></div>
-      <div class="proof-item">
-        <div class="proof-num">98%</div>
-        <div class="proof-lbl">Kepuasan Pelanggan</div>
       </div>
     </div>
   </div>
@@ -1991,27 +2018,18 @@
   </div>
 </footer>
 
-<!-- ── MODAL ───────────────────────────────────────── -->
+<!-- ── PRICING MODAL ───────────────────────────────────────── -->
 <div class="modal-overlay" id="modal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="section-eyebrow" style="font-size:0.62rem;padding:3px 10px;margin-bottom:10px;">Dashboard Access</div>
-    <h2 class="modal-h" id="modTitle">Login RFV Hydro-sense</h2>
-    <p class="modal-sub" id="modSub">Masukkan kredensial untuk mengakses dashboard kontrol.</p>
+    <div class="section-eyebrow" style="font-size:0.62rem;padding:3px 10px;margin-bottom:10px;">Request Demo</div>
+    <h2 class="modal-h" id="modTitle">Minta Demo & Trial Gratis</h2>
+    <p class="modal-sub" id="modSub">Isi formulir untuk memulai uji coba atau membuat janji dengan tim RFV Hydro-sense.</p>
     <div id="planNote" style="display:none;font-size:0.82rem;color:var(--muted);margin-bottom:1rem;">
       Paket terpilih: <strong id="planLabel" style="color:var(--accent);">Starter</strong>
     </div>
 
-    <form id="loginForm" style="display:flex;flex-direction:column;">
-      <label class="form-label">Username</label>
-      <input id="un" type="text" class="form-input" placeholder="admin" autocomplete="username" />
-      <label class="form-label">Password</label>
-      <input id="pw" type="password" class="form-input" placeholder="••••••••" autocomplete="current-password" />
-      <div class="error-msg" id="loginErr"></div>
-      <button type="submit" class="btn-primary" style="justify-content:center;">Masuk Sekarang →</button>
-    </form>
-
-    <form id="pricingForm" style="display:none;flex-direction:column;">
+    <form id="pricingForm" style="display:flex;flex-direction:column;">
       <label class="form-label">Nama</label>
       <input id="pName" type="text" class="form-input" placeholder="Nama lengkap" />
       <label class="form-label">Email</label>
@@ -2378,10 +2396,119 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* Testimonials */
-  gsap.from('#testi-grid .testi-card', {
+  gsap.from('#testi-grid .testimonial-slide', {
     opacity: 0, y: 30, duration: 0.65, stagger: 0.12, ease: 'power3.out',
     scrollTrigger: { trigger: '#testi-grid', start: 'top 82%' }
   });
+
+  const testimonials = [
+    {
+      name: 'Budi Santoso',
+      role: 'Grower',
+      company: 'Yogyakarta',
+      content: 'RFV Hydro-sense benar-benar mengubah cara saya mengelola kebun. Dulu cek pH manual 3x sehari, sekarang semua otomatis!',
+      rating: 5,
+      avatar: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=150&h=150&fit=crop&crop=face'
+    },
+    {
+      name: 'Dewi Pratiwi',
+      role: 'Urban Farmer',
+      company: 'Jakarta',
+      content: 'Dashboard-nya sangat intuitif. Bisa monitoring dari HP saat di luar kota. Panen meningkat 35% sejak pakai RFV!',
+      rating: 5,
+      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face'
+    },
+    {
+      name: 'Mamank Garonk',
+      role: 'Commercial Farm',
+      company: 'Bandung',
+      content: 'Fitur AI recommendations-nya luar biasa. Sistem secara otomatis menyesuaikan nutrisi berdasarkan fase pertumbuhan.',
+      rating: 5,
+      avatar: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=150&h=150&fit=crop&crop=face'
+    }
+  ];
+
+  let activeTestimonialIndex = 0;
+  let testimonialTimer = null;
+  const testimonialInterval = 6000;
+
+  function renderTestimonialCards() {
+    const container = document.getElementById('testi-cards');
+    const dots = document.getElementById('testi-dots');
+    if (!container || !dots) return;
+
+    container.innerHTML = '';
+    dots.innerHTML = '';
+
+    testimonials.forEach((item, index) => {
+      const card = document.createElement('div');
+      card.className = 'testimonial-slide absolute inset-0 w-full h-full rounded-3xl border border-[var(--border)] shadow-2xl p-8 md:p-10 flex flex-col justify-between';
+      card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      card.style.opacity = index === activeTestimonialIndex ? '1' : '0';
+      card.style.transform = index === activeTestimonialIndex ? 'translateX(0) scale(1)' : 'translateX(30px) scale(0.98)';
+      card.style.zIndex = index === activeTestimonialIndex ? '10' : '0';
+      card.style.pointerEvents = index === activeTestimonialIndex ? 'auto' : 'none';
+
+      card.innerHTML = `
+        <div class="flex flex-col h-full justify-between">
+          <div>
+            <div class="mb-6 flex gap-2 items-center">
+              ${Array.from({ length: 5 }).map((_, i) => `<svg class="h-4 w-4 ${i < item.rating ? 'fill-[#FBBF24] text-[#FBBF24]' : 'text-[var(--muted)]'}" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`).join('')}
+            </div>
+            <div class="relative mb-6">
+              <p class="text-base md:text-lg leading-relaxed text-[var(--text)]">${item.content}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4 pt-6 border-t border-[var(--border)]">
+            <div class="h-14 w-14 rounded-full overflow-hidden bg-[var(--surface)] border border-[var(--border)]">
+              <img src="${item.avatar}" alt="${item.name}" class="h-full w-full object-cover" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=150&h=150&fit=crop&crop=face'" />
+            </div>
+            <div>
+              <p class="font-semibold text-[var(--text)]">${item.name}</p>
+              <p class="text-sm text-[var(--muted)]">${item.role} · ${item.company}</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(card);
+
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = index === activeTestimonialIndex ? 'h-2.5 rounded-full testi-dot-active transition-all duration-300' : 'h-2.5 rounded-full testi-dot-inactive transition-all duration-300';
+      dot.setAttribute('aria-label', `Testimonial ${index + 1}`);
+      dot.addEventListener('click', () => {
+        activeTestimonialIndex = index;
+        resetTestimonialAutoplay();
+        renderTestimonialCards();
+      });
+      dots.appendChild(dot);
+    });
+  }
+
+  function startTestimonialAutoplay() {
+    stopTestimonialAutoplay();
+    testimonialTimer = setInterval(() => {
+      activeTestimonialIndex = (activeTestimonialIndex + 1) % testimonials.length;
+      renderTestimonialCards();
+    }, testimonialInterval);
+  }
+
+  function stopTestimonialAutoplay() {
+    if (testimonialTimer) {
+      clearInterval(testimonialTimer);
+      testimonialTimer = null;
+    }
+  }
+
+  function resetTestimonialAutoplay() {
+    stopTestimonialAutoplay();
+    startTestimonialAutoplay();
+  }
+
+  renderTestimonialCards();
+  startTestimonialAutoplay();
 
   /* Map */
   gsap.from('.map-wrap', { opacity: 0, y: 40, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: '.map-wrap', start: 'top 82%' } });
@@ -2398,62 +2525,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* MODAL */
+
   const modal = document.getElementById('modal');
-  let selPlan = '';
+  const planNote = document.getElementById('planNote');
+  const planLabel = document.getElementById('planLabel');
+  const pricingForm = document.getElementById('pricingForm');
 
   window.openModal = (plan = '') => {
-    selPlan = plan;
-    const loginForm = document.getElementById('loginForm');
-    const pricingForm = document.getElementById('pricingForm');
-    const planNote = document.getElementById('planNote');
-    document.getElementById('modTitle').textContent = plan ? (plan === 'Enterprise' ? 'Hubungi Tim Sales' : `Pilih Paket ${plan}`) : 'Login RFV Hydro-sense';
-    document.getElementById('modSub').textContent = plan ? (plan === 'Enterprise' ? 'Kami akan menghubungi Anda untuk solusi Enterprise.' : `Isi data berikut untuk memulai paket ${plan}.`) : 'Masukkan kredensial untuk mengakses dashboard.';
     if (plan) {
-      loginForm.style.display = 'none'; pricingForm.style.display = 'flex';
-      planNote.style.display = 'block'; document.getElementById('planLabel').textContent = plan;
+      planLabel.textContent = plan;
+      planNote.style.display = 'block';
     } else {
-      loginForm.style.display = 'flex'; pricingForm.style.display = 'none'; planNote.style.display = 'none';
+      planNote.style.display = 'none';
     }
-    document.getElementById('loginErr').classList.remove('show');
-    document.getElementById('pricingErr').classList.remove('show');
     modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
   };
 
   window.closeModal = () => {
     modal.classList.remove('open');
-    document.body.style.overflow = '';
   };
 
-  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-  document.getElementById('loginForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const u = document.getElementById('un').value.trim();
-    const p = document.getElementById('pw').value.trim();
-    const errEl = document.getElementById('loginErr');
-    if (u === 'admin' && p === 'agro123') {
-      showToast('Login berhasil! Mengarahkan ke dashboard...', 'success');
+  if (pricingForm) {
+    pricingForm.addEventListener('submit', event => {
+      event.preventDefault();
+      window.showToast('Permintaan Anda telah dikirim. Tim kami akan menghubungi Anda segera.', 'success');
+      pricingForm.reset();
       closeModal();
-      setTimeout(() => { window.location.href = '/dashboard'; }, 600);
-    } else {
-      errEl.textContent = 'Username atau password salah.'; errEl.classList.add('show');
-      document.getElementById('pw').value = '';
-    }
-  });
+    });
+  }
 
-  document.getElementById('pricingForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const n = document.getElementById('pName').value.trim();
-    const em = document.getElementById('pEmail').value.trim();
-    const co = document.getElementById('pCompany').value.trim();
-    const errEl = document.getElementById('pricingErr');
-    if (!n || !em || !co) { errEl.textContent = 'Semua bidang wajib diisi.'; errEl.classList.add('show'); return; }
-    showToast('Permintaan dikirim! Tim kami akan menghubungi Anda.', 'success');
-    closeModal();
-  });
+  if (modal) {
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeModal();
+    });
+  }
 
   window.showToast = (msg, type = 'success') => {
     const t = document.createElement('div');

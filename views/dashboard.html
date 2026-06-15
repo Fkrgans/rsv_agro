@@ -360,7 +360,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
   <div class="tb-breadcrumb">
     <span style="color:var(--muted)">RFV</span>
     <span style="color:var(--muted2);font-size:.8rem">›</span>
-    <span>Administrator</span>
+    <span id="tb-role-label">Administrator</span>
   </div>
 
   <!-- Search -->
@@ -388,7 +388,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       <div class="quick-panel-head">Quick Actions</div>
       <button type="button" class="quick-action" onclick="quickAction('analytics')">View Analytics</button>
       <button type="button" class="quick-action" onclick="quickAction('export')">Export CSV</button>
-      <button type="button" class="quick-action" onclick="quickAction('invite')">Invite Staff</button>
+      <button type="button" class="quick-action" onclick="quickAction('invite')" data-admin-only="true">Invite Staff</button>
       <button type="button" class="quick-action" onclick="quickAction('theme')">Toggle Theme</button>
     </div>
   </div>
@@ -469,14 +469,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
       <div class="nav-icon"><i class="fa-solid fa-seedling"></i></div>
       <span class="nav-label">Grow Plans</span>
     </a>
-    <a class="nav-item" data-tab="billing">
+    <a class="nav-item" data-tab="billing" data-admin-only="true">
       <div class="nav-icon"><i class="fa-solid fa-credit-card"></i></div>
       <span class="nav-label">Billing</span>
       <span class="nav-badge nb-blue" id="billingNavBadge" style="display:none;">0</span>
     </a>
 
     <div class="sb-section" style="margin-top:4px">System</div>
-    <a class="nav-item" data-tab="staff">
+    <a class="nav-item" data-tab="staff" data-admin-only="true">
       <div class="nav-icon"><i class="fa-solid fa-users-gear"></i></div>
       <span class="nav-label">Staff Access</span>
     </a>
@@ -501,11 +501,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
     <!-- Welcome -->
     <div class="welcome-bar">
       <div class="welcome-text">
-        <h2>Welcome back, <em>Admin!</em></h2>
-        <p>Here's what's happening at your hydroponic system today.</p>
+        <h2 id="welcome-heading">Welcome back, <em>Admin!</em></h2>
+        <p id="welcome-subtitle">Here's what's happening at your hydroponic system today.</p>
       </div>
       <div class="welcome-pills">
-        <button class="pill-btn pill-admin">
+        <button id="rolePill" class="pill-btn pill-admin">
           <span>Administrator</span>
         </button>
         <button class="pill-btn pill-notif" onclick="showToast('5 new alerts','warn')">
@@ -1885,12 +1885,59 @@ function updateUserUI(){
   const profileName=document.getElementById('profile-fullname');
   const profileEmail=document.getElementById('profile-email');
   const profileJoined=document.getElementById('profile-joined');
+  const roleLabel=document.getElementById('tb-role-label');
+  const welcomeHeading=document.getElementById('welcome-heading');
+  const rolePill=document.getElementById('rolePill');
+  const welcomeSubtitle=document.getElementById('welcome-subtitle');
+  const roleText = S.user.role === 'Administrator' ? 'Administrator' : 'Pengguna';
+
   if(topAvatar) topAvatar.textContent = S.user.avatar || 'A';
   if(topName) topName.textContent = S.user.name || 'Admin RFV';
   if(profileAvatar) profileAvatar.textContent = S.user.avatar || 'A';
   if(profileName) profileName.textContent = S.user.name || 'Admin RFV';
   if(profileEmail) profileEmail.textContent = S.user.email;
   if(profileJoined) profileJoined.textContent = S.user.joined;
+  if(roleLabel) roleLabel.textContent = roleText;
+  if(welcomeHeading) welcomeHeading.innerHTML = `Welcome back, <em>${S.user.name.split(' ')[0] || 'User'}!</em>`;
+  if(rolePill) rolePill.innerHTML = `<span>${roleText}</span>`;
+  if(welcomeSubtitle) welcomeSubtitle.textContent = S.user.role === 'Administrator'
+    ? "Here's what's happening at your hydroponic system today."
+    : 'Akses terbatas untuk pengguna biasa. Hubungi admin untuk fitur lanjutan.';
+}
+
+function getCookieValue(name) {
+  return document.cookie.split(';').reduce((acc, cookie) => {
+    const [key, value] = cookie.split('=').map(s => s.trim());
+    return key === name ? decodeURIComponent(value) : acc;
+  }, '');
+}
+
+function isAdmin() {
+  return getCookieValue('userRole') === 'admin';
+}
+
+function applyRoleBasedUI() {
+  const admin = isAdmin();
+  const adminOnly = document.querySelectorAll('[data-admin-only]');
+  adminOnly.forEach(el => {
+    el.style.display = admin ? '' : 'none';
+  });
+
+  if (!admin) {
+    S.user.role = 'User';
+    S.user.name = 'Pengguna RSV';
+    S.user.email = 'user@example.com';
+    S.user.avatar = 'P';
+    S.user.joined = 'Feb 2026';
+    if (document.querySelector('.nav-item.active')?.dataset.tab === 'staff' || document.querySelector('.nav-item.active')?.dataset.tab === 'billing') {
+      activatePanel('overview');
+    }
+    if (window.location.hash === '#staff' || window.location.hash === '#billing') {
+      history.replaceState(null, '', '#overview');
+    }
+  } else {
+    S.user.role = 'Administrator';
+  }
 }
 
 function loadThresholdSettings(){
@@ -2095,6 +2142,8 @@ window.addEventListener('DOMContentLoaded',()=>{
     }
   }, 4000);
   loadBillingRequests();
+  applyRoleBasedUI();
+  updateUserUI();
 
   const searchParams = new URLSearchParams(window.location.search);
   const requestedTab = window.location.hash.replace('#','') || searchParams.get('tab') || localStorage.getItem('agroSenseSelectedTab');

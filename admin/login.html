@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RSV Agro — Masuk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --g900:#0d2e0f;
+  --g800:#1a5c1e;
+  --g700:#246328;
+  --g600:#2e7d32;
+  --g500:#3e9042;
+  --g200:#c8e6c9;
+  --g100:#e8f5e9;
+  --white:#ffffff;
+  --off:#f6f8f6;
+  --border:#e4ebe4;
+  --muted:#7a8f7b;
+  --text:#1a2e1b;
+  --error:#c0392b;
+  --errorbg:#fdf2f1;
+  --radius:30px;
+  --inp-r:14px;
+  --dur:.65s;
+  --ease:cubic-bezier(.76,0,.24,1);
+}
+
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:#080e08;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:1.5rem;
+  overflow:hidden;
+  position:relative;
+}
+
+/* ── ambient background ── */
+.bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55}
+.orb-1{width:520px;height:520px;background:radial-gradient(circle,#1a5c1e,transparent 70%);top:-180px;left:-130px;animation:drift1 14s ease-in-out infinite alternate}
+.orb-2{width:380px;height:380px;background:radial-gradient(circle,#0d2e0f,transparent 70%);bottom:-140px;right:-80px;animation:drift2 18s ease-in-out infinite alternate}
+.orb-3{width:260px;height:260px;background:radial-gradient(circle,#246328 20%,transparent 70%);top:40%;right:15%;opacity:.3;animation:drift3 22s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate(40px,30px) scale(1.08)}}
+@keyframes drift2{to{transform:translate(-30px,-40px) scale(1.1)}}
+@keyframes drift3{to{transform:translate(20px,-20px) scale(1.05)}}
+
+/* subtle grid overlay */
+.bg-grid{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+
+/* ── CARD ── */
+.card{
+  position:relative;z-index:1;
+  display:flex;
+  width:100%;max-width:920px;
+  min-height:660px;
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:0 40px 100px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.04),0 4px 20px rgba(0,0,0,.4);
+}
+
+/* ── LEFT — white form ── */
+.form-wrap{
+  position:relative;
+  width:50%;
+  min-width:0;
+  background:var(--white);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:2.8rem 3rem;
+  z-index:2;
+  transition:transform var(--dur) var(--ease);
+  will-change:transform;
+}
+
+/* ── RIGHT — green accent ── */
+.accent{
+  position:relative;
+  width:50%;
+  min-width:0;
+  background:var(--g800);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:3rem 2rem;
+  text-align:center;
+  transition:transform var(--dur) var(--ease);
+  will-change:transform;
+}
+
+/* animated nature patterns */
+.nature-svg{
+  position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;overflow:hidden;
+}
+.n-leaf{opacity:.08;transform-origin:center center}
+.n-leaf-1{animation:sway1 8s ease-in-out infinite alternate}
+.n-leaf-2{animation:sway2 10s ease-in-out infinite alternate}
+.n-leaf-3{animation:sway3 12s ease-in-out infinite alternate}
+@keyframes sway1{to{transform:rotate(6deg) scale(1.04)}}
+@keyframes sway2{to{transform:rotate(-4deg) scale(1.06) translateY(-10px)}}
+@keyframes sway3{to{transform:rotate(8deg) translateX(8px)}}
+
+/* radial glow on accent */
+.accent::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(78,160,83,.28),transparent);
+  pointer-events:none;
+}
+
+/* ── FLIP when signup mode ── */
+.card.flipped .form-wrap{transform:translateX(100%)}
+.card.flipped .accent{transform:translateX(-100%)}
+
+/* ── Deco text ── */
+.deco-wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center}
+.deco-block{
+  display:flex;flex-direction:column;align-items:center;
+  transition:opacity .25s ease,transform .25s ease;
+}
+.deco-block.hidden{display:none;opacity:0;transform:translateY(10px)}
+.deco-block:not(.hidden){opacity:1;transform:translateY(0)}
+
+.accent-badge{
+  display:inline-flex;align-items:center;gap:.4rem;
+  padding:.28rem .75rem;
+  border-radius:50px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.15);
+  font-size:.65rem;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.7);
+  margin-bottom:1.5rem;
+}
+.accent-badge i{font-size:.7rem;color:#a5d6a7}
+
+.accent h2{
+  font-size:2.2rem;font-weight:800;
+  color:#fff;line-height:1.15;
+  margin-bottom:.9rem;
+  text-shadow:0 2px 20px rgba(0,0,0,.3);
+}
+.accent p{
+  font-size:.82rem;color:rgba(255,255,255,.6);
+  line-height:1.75;margin-bottom:2rem;
+  max-width:240px;
+}
+
+/* accent illustration — floating card */
+.float-card{
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;
+  padding:1rem 1.3rem;
+  margin-bottom:2rem;
+  text-align:left;
+  backdrop-filter:blur(4px);
+  animation:float 4s ease-in-out infinite;
+  max-width:230px;
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.fc-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.6rem}
+.fc-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#66bb6a,#2e7d32);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff}
+.fc-name{font-size:.73rem;font-weight:700;color:#fff}
+.fc-role{font-size:.62rem;color:rgba(255,255,255,.5)}
+.fc-stat{display:flex;justify-content:space-between;gap:.5rem}
+.fc-pill{flex:1;background:rgba(255,255,255,.08);border-radius:8px;padding:.35rem .5rem;text-align:center}
+.fc-pill-val{font-size:.78rem;font-weight:700;color:#a5d6a7}
+.fc-pill-lab{font-size:.58rem;color:rgba(255,255,255,.45);margin-top:1px}
+
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.75rem 2rem;
+  border:1.5px solid rgba(255,255,255,.4);
+  border-radius:50px;
+  background:transparent;
+  color:#fff;
+  font-family:inherit;font-size:.75rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  cursor:pointer;
+  transition:background .22s,border-color .22s,transform .15s,box-shadow .22s;
+}
+.btn-ghost:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.8);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.btn-ghost:active{transform:scale(.97)}
+
+/* ── LOGO ── */
+.logo{display:flex;align-items:center;gap:.55rem;margin-bottom:1.6rem}
+.logo-box{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--g600),var(--g800));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:800;color:#fff;letter-spacing:-.02em;
+  box-shadow:0 4px 12px rgba(46,125,50,.35);
+}
+.logo-text{font-size:.82rem;font-weight:800;color:var(--text);letter-spacing:.04em}
+.logo-dot{color:var(--g600)}
+
+/* ── HEADINGS ── */
+.eyebrow{
+  font-size:.65rem;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--g600);margin-bottom:.4rem;
+}
+.form-wrap h1{
+  font-size:1.9rem;font-weight:800;
+  color:var(--text);
+  margin-bottom:1.6rem;line-height:1.15;
+}
+
+/* ── SOCIAL BUTTONS ── */
+.social-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:.6rem;margin-bottom:1.3rem;
+}
+.soc-btn{
+  display:flex;align-items:center;justify-content:center;gap:.4rem;
+  height:44px;
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  background:var(--off);
+  font-family:inherit;font-size:.75rem;font-weight:600;
+  color:var(--text);cursor:pointer;
+  transition:all .2s;position:relative;overflow:hidden;
+}
+.soc-btn::after{content:'';position:absolute;inset:0;background:transparent;transition:background .2s}
+.soc-btn:hover{border-color:var(--g600);background:#f0f7f0;transform:translateY(-1px);box-shadow:0 4px 12px rgba(46,125,50,.12)}
+.soc-btn:hover i.fa-google{color:#ea4335}
+.soc-btn:hover i.fa-github{color:#24292e}
+.soc-btn:hover i.fa-facebook-f{color:#1877f2}
+.soc-btn:active{transform:scale(.97)}
+.soc-btn i{font-size:.9rem;transition:color .2s}
+.soc-btn .soc-label{font-size:.72rem}
+/* loading spinner for soc btns */
+.soc-btn.loading{pointer-events:none;opacity:.6}
+.soc-btn.loading .soc-icon{display:none}
+.soc-btn.loading::before{
+  content:'';width:16px;height:16px;border:2px solid var(--border);
+  border-top-color:var(--g600);border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── DIVIDER ── */
+.divider{
+  display:flex;align-items:center;gap:.7rem;
+  margin-bottom:1.2rem;
+  font-size:.68rem;font-weight:600;
+  letter-spacing:.08em;color:var(--muted);
+  text-transform:uppercase;
+}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── FIELDS ── */
+.fields{display:flex;flex-direction:column;gap:1rem;margin-bottom:1rem}
+.field-wrap{position:relative}
+.field-label{
+  display:block;font-size:.7rem;font-weight:700;
+  color:var(--muted);margin-bottom:.35rem;
+  letter-spacing:.05em;text-transform:uppercase;
+  transition:color .2s;
+}
+.field-inner{position:relative}
+.field-icon{
+  position:absolute;left:1rem;top:50%;transform:translateY(-50%);
+  font-size:.82rem;color:var(--muted);pointer-events:none;transition:color .2s;
+  z-index:1;
+}
+.field-input{
+  width:100%;height:54px;
+  padding:0 3rem 0 2.8rem;
+  border:1.5px solid var(--border);
+  border-radius:var(--inp-r);
+  background:var(--off);
+  font-family:inherit;font-size:.85rem;
+  color:var(--text);
+  outline:none;
+  transition:border-color .2s,background .2s,box-shadow .2s;
+}
+.field-input::placeholder{color:#b8c8b9}
+.field-input:focus{
+  border-color:var(--g600);background:#fff;
+  box-shadow:0 0 0 3px rgba(46,125,50,.1);
+}
+.field-wrap:focus-within .field-label{color:var(--g700)}
+.field-wrap:focus-within .field-icon{color:var(--g600)}
+
+/* error state */
+.field-wrap.error .field-input{border-color:var(--error);background:var(--errorbg);box-shadow:0 0 0 3px rgba(192,57,43,.08)}
+.field-wrap.error .field-label{color:var(--error)}
+.field-wrap.error .field-icon{color:var(--error)}
+.field-err{
+  display:none;font-size:.68rem;color:var(--error);
+  margin-top:.3rem;padding-left:.2rem;
+  animation:errShake .3s ease;
+}
+.field-wrap.error .field-err{display:block}
+@keyframes errShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* success state */
+.field-wrap.valid .field-input{border-color:#43a047;background:#fff;box-shadow:0 0 0 3px rgba(67,160,71,.08)}
+.field-wrap.valid .field-icon{color:#43a047}
+
+/* toggle password */
+.toggle-pw{
+  position:absolute;right:.9rem;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;
+  color:var(--muted);font-size:.82rem;
+  padding:.25rem;transition:color .2s;
+  z-index:2;
+}
+.toggle-pw:hover{color:var(--g600)}
+
+/* password strength */
+.pw-strength{display:none;margin-top:.4rem}
+.pw-strength.show{display:block}
+.pw-bars{display:flex;gap:3px;margin-bottom:.25rem}
+.pw-bar{
+  flex:1;height:3px;border-radius:2px;
+  background:var(--border);
+  transition:background .3s;
+}
+.pw-bar.active-weak{background:#e74c3c}
+.pw-bar.active-fair{background:#f39c12}
+.pw-bar.active-good{background:#27ae60}
+.pw-bar.active-strong{background:#1a7a2e}
+.pw-label{font-size:.65rem;color:var(--muted)}
+
+/* ── FORGOT LINK ── */
+.forgot-row{display:flex;justify-content:flex-end;margin-bottom:1.1rem}
+.forgot{
+  font-size:.73rem;color:var(--muted);
+  text-decoration:none;font-weight:500;
+  transition:color .2s;
+  background:none;border:none;cursor:pointer;
+  font-family:inherit;
+}
+.forgot:hover{color:var(--g600)}
+
+/* remember me */
+.check-row{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;cursor:pointer}
+.check-row input[type=checkbox]{
+  width:16px;height:16px;accent-color:var(--g600);cursor:pointer;
+}
+.check-row span{font-size:.75rem;color:var(--muted);font-weight:500}
+
+/* ── PRIMARY BUTTON ── */
+.btn-primary{
+  width:100%;height:54px;
+  border:none;border-radius:var(--inp-r);
+  background:linear-gradient(135deg,#10b981,#047857);
+  color:#fff;
+  font-family:inherit;font-size:.86rem;font-weight:800;
+  letter-spacing:.16em;text-transform:uppercase;
+  cursor:pointer;
+  transition:transform .15s,box-shadow .2s,opacity .2s;
+  box-shadow:0 6px 22px rgba(46,125,50,.4);
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+  position:relative;overflow:hidden;
+}
+.btn-primary::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.12),transparent);
+  pointer-events:none;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(46,125,50,.45)}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{opacity:.55;cursor:default;transform:none}
+.btn-primary.loading-state{pointer-events:none}
+.btn-primary .btn-spinner{
+  display:none;width:18px;height:18px;
+  border:2.5px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+.btn-primary.loading-state .btn-label{display:none}
+.btn-primary.loading-state .btn-spinner{display:block}
+
+/* ── MOBILE SWITCH ── */
+.mobile-sw{
+  display:none;margin-top:1.2rem;
+  text-align:center;font-size:.76rem;color:var(--muted);
+}
+.mobile-sw button{
+  background:none;border:none;cursor:pointer;
+  font-family:inherit;font-size:inherit;
+  color:var(--g600);font-weight:700;
+  transition:color .2s;
+}
+.mobile-sw button:hover{color:var(--g800)}
+
+/* ── SUB PANELS ── */
+.sub{
+  display:none;
+  flex-direction:column;
+  width:100%;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(10px);
+  transition:opacity .25s ease,transform .25s ease,visibility .25s;
+}
+.sub.active{
+  display:flex;
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+  animation:fadeUp .4s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── MODAL — Lupa Sandi ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:100;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:1rem;
+}
+.modal-overlay.open{display:flex;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{
+  background:#fff;border-radius:22px;
+  padding:2.2rem;width:100%;max-width:380px;
+  box-shadow:0 30px 80px rgba(0,0,0,.35);
+  animation:slideUp .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.modal-title{font-size:1.1rem;font-weight:800;color:var(--text)}
+.modal-close{
+  background:none;border:none;cursor:pointer;
+  color:var(--muted);font-size:1rem;
+  padding:.3rem;border-radius:8px;transition:background .2s,color .2s;
+}
+.modal-close:hover{background:var(--off);color:var(--text)}
+.modal-desc{font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:1.2rem}
+.modal-success{display:none;text-align:center;padding:1rem 0}
+.modal-success i{font-size:2.2rem;color:var(--g600);margin-bottom:.7rem;display:block}
+.modal-success p{font-size:.82rem;color:var(--muted);line-height:1.7}
+.modal-success strong{color:var(--text)}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;top:1.2rem;right:1.2rem;z-index:200;
+  display:flex;align-items:flex-start;gap:.8rem;
+  background:#111;color:#fff;
+  padding:.9rem 1.2rem;
+  border-radius:16px;
+  box-shadow:0 16px 48px rgba(0,0,0,.55);
+  border:1px solid rgba(255,255,255,.07);
+  transform:translateY(-6rem) scale(.95);opacity:0;
+  transition:all .38s cubic-bezier(.34,1.56,.64,1);
+  max-width:310px;min-width:240px;
+  pointer-events:none;
+}
+.toast.show{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
+.toast-icon{
+  width:34px;height:34px;flex-shrink:0;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;margin-top:1px;
+}
+.toast-icon.success{background:rgba(46,125,50,.2);color:#66bb6a}
+.toast-icon.error{background:rgba(192,57,43,.2);color:#e74c3c}
+.toast-icon.info{background:rgba(30,100,200,.2);color:#64b5f6}
+.toast-body .toast-title{font-size:.8rem;font-weight:700;margin-bottom:2px}
+.toast-body .toast-msg{font-size:.72rem;color:rgba(255,255,255,.5);line-height:1.55}
+.toast-close{
+  position:absolute;top:.6rem;right:.7rem;
+  background:none;border:none;color:rgba(255,255,255,.35);
+  font-size:.75rem;cursor:pointer;transition:color .2s;
+}
+.toast-close:hover{color:#fff}
+
+/* ── PROGRESS bar on top ── */
+.top-bar{
+  position:fixed;top:0;left:0;height:3px;
+  background:linear-gradient(90deg,var(--g600),#66bb6a);
+  z-index:300;width:0;
+  transition:width .6s ease,opacity .3s;
+  border-radius:0 2px 2px 0;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  .card{flex-direction:column;min-height:0;border-radius:24px;max-width:520px}
+  .form-wrap{width:100%;padding:2.4rem 1.8rem}
+  .accent{display:none}
+  .mobile-sw{display:block}
+  .card.flipped .form-wrap{transform:none}
+  .social-grid{grid-template-columns:repeat(3,1fr)}
+  .soc-label{display:none}
+}
+@media(max-width:380px){
+  .social-grid{grid-template-columns:repeat(2,1fr)}
+  .form-wrap{padding:2rem 1.2rem}
+}
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div class="bg-grid"></div>
+<div class="top-bar" id="topBar"></div>
+
+<!-- ══════════ MAIN CARD ══════════ -->
+<div class="card" id="card">
+
+  <!-- ── FORM PANE ── -->
+  <div class="form-wrap" id="formWrap">
+
+    <!-- SIGN IN -->
+    <div class="sub active" id="subSignin">
+      <div class="logo">
+        <div class="logo-box">RSV</div>
+        <div class="logo-text">RSV<span class="logo-dot">.</span>Agro</div>
+      </div>
+      <p class="eyebrow">Platform Pertanian Cerdas</p>
+      <h1>Masuk ke<br>akun Anda</h1>
+
+      <div class="social-grid">
+        <button type="button" class="soc-btn social-google" onclick="window.location.href='/auth/google'">
+          <span class="soc-icon"><i class="fab fa-google"></i></span>
+          <span class="soc-label">Google</span>
+        </button>
+        <button type="button" class="soc-btn social-github" onclick="window.location.href='/auth/github'">
+          <span class="soc-icon"><i class="fab fa-github"></i></span>
+          <span class="soc-label">GitHub</span>
+        </button>
+        <button type="button" class="soc-btn social-facebook" onclick="window.location.href='/auth/facebook'">
+          <span class="soc-icon"><i class="fab fa-facebook-f"></i></span>
+          <span class="soc-label">Facebook</span>
+        </button>
+      </div>
+
+      <div class="divider">atau dengan email</div>
+
+      <form id="formSignin" action="/login" method="POST" onsubmit="submitSignin(event)" novalidate>
+        <div class="fields">
+          <div class="field-wrap" id="fw-email-in">
+            <label class="field-label">Alamat Email</label>
+            <div class="field-inner">
+              <i class="fas fa-envelope field-icon"></i>
+              <input class="field-input" type="email" name="email" id="in-email" placeholder="nama@email.com" autocomplete="email"
+                oninput="validateEmailField('fw-email-in','in-email')">
+            </div>
+            <div class="field-err">Masukkan alamat email yang valid.</div>
+          </div>
+
+          <div class="field-wrap" id="fw-pw-in">
+            <label class="field-label">Kata Sandi</label>
+            <div class="field-inner">
+              <i class="fas fa-lock field-icon"></i>
+              <input class="field-input" type="password" name="password" id="in-pw" placeholder="Kata sandi Anda" autocomplete="current-password"
+                oninput="clearError('fw-pw-in')">
+              <button type="button" class="toggle-pw" onclick="togglePw('in-pw',this)" aria-label="Tampilkan sandi">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="field-err">Kata sandi tidak boleh kosong.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem">
+          <label class="check-row" style="margin-bottom:0">
+            <input type="checkbox" id="remember">
+            <span>Ingat saya</span>
+          </label>
+          <button type="button" class="forgot" onclick="openForgot()">Lupa kata sandi?</button>
+        </div>
+
+        <button type="submit" class="btn-primary" id="btnSignin">
+          <span class="btn-label"><i class="fas fa-arrow-right-to-bracket" style="margin-right:.4rem"></i>Masuk</span>
+          <div class="btn-spinner"></div>
+        </button>
+      </form>
+
+      <div class="mobile-sw">
+        Belum punya akun?
+        <button onclick="setMode(true)">Daftar sekarang</button>
+      </div>
+    </div>
+
+    <!-- SIGN UP -->
+    <div class="sub" id="subSignup">
+      <div class="logo">
+        <div class="logo-box">RSV</div>
+        <div class="logo-text">RSV<span class="logo-dot">.</span>Agro</div>
+      </div>
+      <p class="eyebrow">Bergabung gratis</p>
+      <h1>Buat akun baru Anda</h1>
+
+      <div class="social-grid">
+        <button type="button" class="soc-btn social-google" onclick="window.location.href='/auth/google'">
+          <span class="soc-icon"><i class="fab fa-google"></i></span>
+          <span class="soc-label">Google</span>
+        </button>
+        <button type="button" class="soc-btn social-github" onclick="window.location.href='/auth/github'">
+          <span class="soc-icon"><i class="fab fa-github"></i></span>
+          <span class="soc-label">GitHub</span>
+        </button>
+        <button type="button" class="soc-btn social-facebook" onclick="window.location.href='/auth/facebook'">
+          <span class="soc-icon"><i class="fab fa-facebook-f"></i></span>
+          <span class="soc-label">Facebook</span>
+        </button>
+      </div>
+
+      <div class="divider">atau dengan email</div>
+
+      <form id="formSignup" onsubmit="submitSignup(event)" novalidate>
+        <div class="fields">
+          <div class="field-wrap" id="fw-name">
+            <label class="field-label">Nama Lengkap</label>
+            <div class="field-inner">
+              <i class="fas fa-user field-icon"></i>
+              <input class="field-input" type="text" id="up-name" placeholder="Nama lengkap Anda" autocomplete="name"
+                oninput="validateNameField('fw-name','up-name')">
+            </div>
+            <div class="field-err">Nama minimal 3 karakter.</div>
+          </div>
+
+          <div class="field-wrap" id="fw-email-up">
+            <label class="field-label">Alamat Email</label>
+            <div class="field-inner">
+              <i class="fas fa-envelope field-icon"></i>
+              <input class="field-input" type="email" id="up-email" placeholder="nama@email.com" autocomplete="email"
+                oninput="validateEmailField('fw-email-up','up-email')">
+            </div>
+            <div class="field-err">Masukkan alamat email yang valid.</div>
+          </div>
+
+          <div class="field-wrap" id="fw-pw-up">
+            <label class="field-label">Buat Kata Sandi</label>
+            <div class="field-inner">
+              <i class="fas fa-lock field-icon"></i>
+              <input class="field-input" type="password" id="up-pw" placeholder="Min. 8 karakter" autocomplete="new-password"
+                oninput="checkStrength('up-pw');clearError('fw-pw-up')">
+              <button type="button" class="toggle-pw" onclick="togglePw('up-pw',this)" aria-label="Tampilkan sandi">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="field-err">Kata sandi minimal 8 karakter.</div>
+            <div class="pw-strength" id="pwStrength">
+              <div class="pw-bars">
+                <div class="pw-bar" id="bar1"></div>
+                <div class="pw-bar" id="bar2"></div>
+                <div class="pw-bar" id="bar3"></div>
+                <div class="pw-bar" id="bar4"></div>
+              </div>
+              <span class="pw-label" id="pwLabel">Kekuatan kata sandi</span>
+            </div>
+          </div>
+
+          <div class="field-wrap" id="fw-pw2">
+            <label class="field-label">Konfirmasi Kata Sandi</label>
+            <div class="field-inner">
+              <i class="fas fa-shield-halved field-icon"></i>
+              <input class="field-input" type="password" id="up-pw2" placeholder="Ulangi kata sandi" autocomplete="new-password"
+                oninput="validateConfirmPw()">
+              <button type="button" class="toggle-pw" onclick="togglePw('up-pw2',this)" aria-label="Tampilkan konfirmasi">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="field-err">Kata sandi tidak cocok.</div>
+          </div>
+        </div>
+
+        <label class="check-row" style="margin-bottom:1rem">
+          <input type="checkbox" id="agree" required>
+          <span>Saya menyetujui <a href="#" style="color:var(--g600);font-weight:600;text-decoration:none">Syarat & Ketentuan</a></span>
+        </label>
+
+        <button type="submit" class="btn-primary" id="btnSignup">
+          <span class="btn-label"><i class="fas fa-seedling" style="margin-right:.4rem"></i>Buat Akun</span>
+          <div class="btn-spinner"></div>
+        </button>
+      </form>
+
+      <div class="mobile-sw">
+        Sudah punya akun?
+        <button onclick="setMode(false)">Masuk di sini</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── ACCENT PANE ── -->
+  <div class="accent">
+    <svg class="nature-svg" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+      <ellipse class="n-leaf n-leaf-1" cx="340" cy="80" rx="90" ry="140" fill="white" transform="rotate(30 340 80)"/>
+      <ellipse class="n-leaf n-leaf-2" cx="60" cy="480" rx="80" ry="120" fill="white" transform="rotate(-20 60 480)"/>
+      <ellipse class="n-leaf n-leaf-3" cx="200" cy="300" rx="50" ry="80" fill="white" transform="rotate(10 200 300)"/>
+    </svg>
+
+    <div class="deco-wrap">
+
+      <!-- Sign-in deco -->
+      <div class="deco-block" id="decoIn">
+        <div class="accent-badge"><i class="fas fa-leaf"></i> RSV Agro Platform</div>
+
+        <!-- floating card -->
+        <div class="float-card">
+          <div class="fc-row">
+            <div class="fc-avatar">BU</div>
+            <div><div class="fc-name">Budi Santoso</div><div class="fc-role">Petani Premium · Jawa Tengah</div></div>
+          </div>
+          <div class="fc-stat">
+            <div class="fc-pill"><div class="fc-pill-val">4.2 ha</div><div class="fc-pill-lab">Lahan</div></div>
+            <div class="fc-pill"><div class="fc-pill-val">+38%</div><div class="fc-pill-lab">Hasil</div></div>
+            <div class="fc-pill"><div class="fc-pill-val">97%</div><div class="fc-pill-lab">Skor</div></div>
+          </div>
+        </div>
+
+        <h2>Selamat<br>datang kembali</h2>
+        <p>Monitor lahan, pantau cuaca, dan optimalkan hasil panen dari satu platform.</p>
+        <button class="btn-ghost" onclick="setMode(true)">
+          <i class="fas fa-seedling"></i> Belum punya akun?
+        </button>
+      </div>
+
+      <!-- Sign-up deco -->
+      <div class="deco-block hidden" id="decoUp">
+        <div class="accent-badge"><i class="fas fa-leaf"></i> RSV Agro Platform</div>
+
+        <div class="float-card" style="animation-delay:.5s">
+          <div class="fc-row">
+            <div class="fc-avatar" style="background:linear-gradient(135deg,#81c784,#388e3c)">SR</div>
+            <div><div class="fc-name">Sari Rahayu</div><div class="fc-role">Petani Baru · Sumatera</div></div>
+          </div>
+          <div class="fc-stat">
+            <div class="fc-pill"><div class="fc-pill-val">Free</div><div class="fc-pill-lab">Paket</div></div>
+            <div class="fc-pill"><div class="fc-pill-val">IoT</div><div class="fc-pill-lab">Sensor</div></div>
+            <div class="fc-pill"><div class="fc-pill-val">AI</div><div class="fc-pill-lab">Analitik</div></div>
+          </div>
+        </div>
+
+        <h2>Mulai perjalanan<br>pertanian Anda</h2>
+        <p>Bergabung dengan 12.000+ petani Indonesia yang sudah menggunakan RSV Agro.</p>
+        <button class="btn-ghost" onclick="setMode(false)">
+          <i class="fas fa-arrow-right-to-bracket"></i> Sudah punya akun?
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL — Lupa Sandi ══ -->
+<div class="modal-overlay" id="modalForgot" onclick="closeForgotOutside(event)">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-header">
+      <div class="modal-title">Reset Kata Sandi</div>
+      <button class="modal-close" onclick="closeForgot()"><i class="fas fa-xmark"></i></button>
+    </div>
+
+    <div id="forgotForm">
+      <p class="modal-desc">Masukkan email terdaftar. Kami akan kirimkan tautan reset ke kotak masuk Anda.</p>
+      <div class="field-wrap" id="fw-forgot" style="margin-bottom:1rem">
+        <label class="field-label">Alamat Email</label>
+        <div class="field-inner">
+          <i class="fas fa-envelope field-icon"></i>
+          <input class="field-input" type="email" id="forgot-email" placeholder="email@domain.com"
+            oninput="validateEmailField('fw-forgot','forgot-email')">
+        </div>
+        <div class="field-err">Masukkan email yang valid.</div>
+      </div>
+      <button class="btn-primary" onclick="submitForgot()" id="btnForgot" style="position:relative">
+        <span class="btn-label"><i class="fas fa-paper-plane" style="margin-right:.4rem"></i>Kirim Tautan Reset</span>
+        <div class="btn-spinner"></div>
+      </button>
+    </div>
+
+    <div class="modal-success" id="forgotSuccess">
+      <i class="fas fa-envelope-circle-check"></i>
+      <p>Email berhasil dikirim ke<br><strong id="forgotEmailDisplay"></strong><br><br>Periksa kotak masuk atau folder spam Anda.</p>
+      <button class="btn-primary" onclick="closeForgot()" style="margin-top:1.2rem">
+        <span class="btn-label">Tutup</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast">
+  <div class="toast-icon" id="toastIcon"><i class="fas fa-check"></i></div>
+  <div class="toast-body">
+    <div class="toast-title" id="toastTitle"></div>
+    <div class="toast-msg" id="toastMsg"></div>
+  </div>
+  <button class="toast-close" onclick="hideToast()" aria-label="Tutup notifikasi"><i class="fas fa-xmark"></i></button>
+</div>
+
+<script>
+/* ── STATE ── */
+let mode = 'signin'; // 'signin' | 'signup'
+let toastTimer, topBarTimer;
+
+/* ── MODE SWITCH ── */
+function setMode(toSignup) {
+  mode = toSignup ? 'signup' : 'signin';
+  const card = document.getElementById('card');
+  const subIn = document.getElementById('subSignin');
+  const subUp = document.getElementById('subSignup');
+  const decoIn = document.getElementById('decoIn');
+  const decoUp = document.getElementById('decoUp');
+
+  if (toSignup) {
+    card.classList.add('flipped');
+    subIn.classList.remove('active');
+    subUp.classList.add('active');
+    decoIn.classList.add('hidden');
+    decoUp.classList.remove('hidden');
+  } else {
+    card.classList.remove('flipped');
+    subUp.classList.remove('active');
+    subIn.classList.add('active');
+    decoUp.classList.add('hidden');
+    decoIn.classList.remove('hidden');
+  }
+  // reset forms
+  document.getElementById('formSignin').reset();
+  document.getElementById('formSignup').reset();
+  clearAllErrors();
+}
+
+/* ── PASSWORD TOGGLE ── */
+function togglePw(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  const icon = btn.querySelector('i');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.classList.replace('fa-eye','fa-eye-slash');
+    btn.setAttribute('aria-label','Sembunyikan sandi');
+  } else {
+    inp.type = 'password';
+    icon.classList.replace('fa-eye-slash','fa-eye');
+    btn.setAttribute('aria-label','Tampilkan sandi');
+  }
+}
+
+/* ── PASSWORD STRENGTH ── */
+function checkStrength(inputId) {
+  const val = document.getElementById(inputId).value;
+  const str = document.getElementById('pwStrength');
+  const label = document.getElementById('pwLabel');
+  const bars = ['bar1','bar2','bar3','bar4'];
+
+  if (!val) { str.classList.remove('show'); return; }
+  str.classList.add('show');
+
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+
+  const classes = ['active-weak','active-fair','active-good','active-strong'];
+  const labels = ['Lemah','Cukup','Kuat','Sangat Kuat'];
+
+  bars.forEach((id, i) => {
+    const bar = document.getElementById(id);
+    bar.className = 'pw-bar';
+    if (i < score) bar.classList.add(classes[score - 1]);
+  });
+  label.textContent = labels[score - 1] || 'Kekuatan kata sandi';
+}
+
+/* ── VALIDATION ── */
+function validateEmailField(wrapId, inputId) {
+  const inp = document.getElementById(inputId);
+  const wrap = document.getElementById(wrapId);
+  const val = inp.value.trim();
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  setFieldState(wrap, val ? (valid ? 'valid' : 'error') : '');
+  return valid && val;
+}
+
+function validateNameField(wrapId, inputId) {
+  const inp = document.getElementById(inputId);
+  const wrap = document.getElementById(wrapId);
+  const val = inp.value.trim();
+  const valid = val.length >= 3;
+  setFieldState(wrap, val ? (valid ? 'valid' : 'error') : '');
+  return valid && val;
+}
+
+function validateConfirmPw() {
+  const pw = document.getElementById('up-pw').value;
+  const pw2 = document.getElementById('up-pw2').value;
+  const wrap = document.getElementById('fw-pw2');
+  if (!pw2) { setFieldState(wrap, ''); return false; }
+  const match = pw === pw2;
+  setFieldState(wrap, match ? 'valid' : 'error');
+  return match;
+}
+
+function setFieldState(wrap, state) {
+  wrap.classList.remove('error','valid');
+  if (state) wrap.classList.add(state);
+}
+
+function clearError(wrapId) {
+  const w = document.getElementById(wrapId);
+  if (w) w.classList.remove('error');
+}
+
+function clearAllErrors() {
+  document.querySelectorAll('.field-wrap').forEach(w => w.classList.remove('error','valid'));
+  document.getElementById('pwStrength').classList.remove('show');
+}
+
+/* ── FORM SUBMIT — SIGN IN ── */
+async function submitSignin(e) {
+  e.preventDefault();
+  let ok = true;
+
+  const emailOk = validateEmailField('fw-email-in','in-email');
+  const pw = document.getElementById('in-pw').value;
+  const pwWrap = document.getElementById('fw-pw-in');
+
+  if (!emailOk) ok = false;
+  if (!pw) { setFieldState(pwWrap,'error'); ok = false; }
+  else setFieldState(pwWrap,'valid');
+
+  if (!ok) return shakeBtn('btnSignin');
+
+  const btn = document.getElementById('btnSignin');
+  setLoading(btn, true);
+  startTopBar();
+
+  try {
+    const response = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: document.getElementById('in-email').value.trim(),
+        password: pw
+      })
+    });
+
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      setLoading(btn, false);
+      finishTopBar();
+      setFieldState(pwWrap, 'error');
+      showToast('error','Login gagal','Email atau kata sandi salah.');
+      return;
+    }
+
+    showToast('success','Masuk Berhasil! 🌿', 'Mengalihkan ke dashboard...');
+    window.location.href = result.redirect || '/dashboard';
+  } catch (err) {
+    setLoading(btn, false);
+    finishTopBar();
+    showToast('error','Kesalahan koneksi','Tidak dapat terhubung ke server. Coba lagi.');
+  }
+}
+
+/* ── FORM SUBMIT — SIGN UP ── */
+async function submitSignup(e) {
+  e.preventDefault();
+  let ok = true;
+
+  const nameOk = validateNameField('fw-name','up-name');
+  const emailOk = validateEmailField('fw-email-up','up-email');
+  const pw = document.getElementById('up-pw').value;
+  const pwWrap = document.getElementById('fw-pw-up');
+  const pw2Ok = validateConfirmPw();
+  const agree = document.getElementById('agree').checked;
+
+  if (!nameOk) ok = false;
+  if (!emailOk) ok = false;
+  if (pw.length < 8) { setFieldState(pwWrap,'error'); ok = false; }
+  if (!pw2Ok) ok = false;
+  if (!agree) {
+    showToast('warn','Syarat Belum Disetujui','Centang persetujuan syarat & ketentuan terlebih dahulu.');
+    ok = false;
+  }
+
+  if (!ok) return shakeBtn('btnSignup');
+
+  const btn = document.getElementById('btnSignup');
+  setLoading(btn, true);
+  startTopBar();
+
+  try {
+    const response = await fetch('/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: document.getElementById('up-name').value.trim(),
+        email: document.getElementById('up-email').value.trim(),
+        password: pw
+      })
+    });
+
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      setLoading(btn, false);
+      finishTopBar();
+      showToast('error','Registrasi Gagal', result.message || 'Tidak dapat membuat akun.');
+      return;
+    }
+
+    setLoading(btn, false);
+    finishTopBar();
+    showToast('success','Akun Berhasil Dibuat! 🌱','Silakan masuk untuk melanjutkan.');
+    setMode(false);
+    document.getElementById('formSignup').reset();
+    return;
+  } catch (err) {
+    setLoading(btn, false);
+    finishTopBar();
+    showToast('error','Kesalahan koneksi','Tidak dapat terhubung ke server. Coba lagi.');
+  }
+}
+
+/* ── SOCIAL LOGIN ── */
+function handleSocial(btn, platform) {
+  const provider = platform.toLowerCase();
+  window.location.href = `/auth/${provider}`;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('error')) {
+    showToast('error','Login gagal','Tidak dapat melakukan login sosial. Silakan coba lagi.');
+  }
+  if (params.get('registered')) {
+    showToast('success','Akun terdaftar','Akun berhasil dibuat. Silakan masuk.');
+  }
+});
+
+/* ── FORGOT PASSWORD ── */
+function openForgot() {
+  document.getElementById('modalForgot').classList.add('open');
+  document.getElementById('forgot-email').focus();
+  // prefill if email already typed
+  const existEmail = document.getElementById('in-email').value;
+  if (existEmail) document.getElementById('forgot-email').value = existEmail;
+}
+
+function closeForgot() {
+  const overlay = document.getElementById('modalForgot');
+  overlay.classList.remove('open');
+  setTimeout(() => {
+    document.getElementById('forgotForm').style.display = '';
+    document.getElementById('forgotSuccess').style.display = 'none';
+    document.getElementById('forgot-email').value = '';
+    document.getElementById('fw-forgot').classList.remove('error','valid');
+  }, 300);
+}
+
+function closeForgotOutside(e) {
+  if (e.target === document.getElementById('modalForgot')) closeForgot();
+}
+
+function submitForgot() {
+  const emailOk = validateEmailField('fw-forgot','forgot-email');
+  if (!emailOk) return;
+
+  const btn = document.getElementById('btnForgot');
+  setLoading(btn, true);
+
+  setTimeout(() => {
+    setLoading(btn, false);
+    const email = document.getElementById('forgot-email').value;
+    document.getElementById('forgotEmailDisplay').textContent = email;
+    document.getElementById('forgotForm').style.display = 'none';
+    document.getElementById('forgotSuccess').style.display = 'block';
+    showToast('success','Email Terkirim 📧','Cek kotak masuk untuk tautan reset sandi.');
+  }, 1800);
+}
+
+/* ── HELPERS ── */
+function setLoading(btn, on) {
+  if (on) btn.classList.add('loading-state');
+  else btn.classList.remove('loading-state');
+  btn.disabled = on;
+}
+
+function shakeBtn(id) {
+  const btn = document.getElementById(id);
+  btn.style.animation = 'errShake .3s ease';
+  setTimeout(() => btn.style.animation = '', 400);
+}
+
+let topBarInt;
+function startTopBar() {
+  const bar = document.getElementById('topBar');
+  bar.style.width = '0';bar.style.opacity = '1';
+  clearInterval(topBarInt);
+  let w = 0;
+  topBarInt = setInterval(() => {
+    w = Math.min(w + Math.random() * 8, 80);
+    bar.style.width = w + '%';
+  }, 200);
+}
+function finishTopBar() {
+  clearInterval(topBarInt);
+  const bar = document.getElementById('topBar');
+  bar.style.width = '100%';
+  setTimeout(() => { bar.style.opacity = '0'; setTimeout(() => bar.style.width = '0', 300); }, 400);
+}
+
+let toastClear;
+function showToast(type, title, msg) {
+  clearTimeout(toastClear);
+  const toast = document.getElementById('toast');
+  const icon = document.getElementById('toastIcon');
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent = msg;
+
+  icon.className = 'toast-icon ' + type;
+  const icons = { success:'fa-check', error:'fa-xmark', info:'fa-circle-info' };
+  icon.innerHTML = `<i class="fas ${icons[type] || 'fa-check'}"></i>`;
+
+  toast.classList.remove('show');
+  void toast.offsetWidth;
+  toast.classList.add('show');
+  toastClear = setTimeout(() => hideToast(), 4200);
+}
+
+function hideToast() {
+  document.getElementById('toast').classList.remove('show');
+}
+
+/* ── ESC closes modal ── */
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeForgot(); });
+</script>
+</body>
+</html>
